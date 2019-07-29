@@ -214,8 +214,8 @@
     <None Include="SiteConfig\Web.PRO.config" />
     <None Include="SiteConfig\Web.SIT.config" />
     <None Include="SiteConfig\Web.UAT.config" />
-    <None Include="Web.AppSettings.config" />
-    <None Include="Web.ConnectionStrings.config" />
+    <Content Include="Web.AppSettings.config" />
+    <Content Include="Web.ConnectionStrings.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
