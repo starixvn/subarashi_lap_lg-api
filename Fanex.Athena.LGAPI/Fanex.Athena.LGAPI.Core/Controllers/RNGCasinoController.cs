@@ -1,8 +1,8 @@
 ﻿using System.Web.Mvc;
+
 using Fanex.Athena.LGAPI.Core.Attributes;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.RNGCasino;
 using Fanex.Athena.LGAPI.Core.RNGCasino.Service;
-using Fanex.Athena.LGAPI.Core.Service.RNGCasino;
 
 namespace Fanex.Athena.LGAPI.Core.Controllers
 {
