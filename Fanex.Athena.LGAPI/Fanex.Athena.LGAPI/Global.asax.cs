@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
@@ -8,6 +9,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using Fanex.Athena.LGAPI.Core.Utility;
 using Fanex.Logging;
+using Fanex.Logging.RabbitMQ;
 
 namespace Fanex.Athena.LGAPI
 {
@@ -19,6 +21,13 @@ namespace Fanex.Athena.LGAPI
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+            LogManager
+                   .SetDefaultLogCategory(ConfigurationManager.AppSettings["Fanex.Logging-LogCategory"])
+                   .Use(new List<ILogEngine>
+                    {
+                         new RabbitMQLogging(ConfigurationManager.AppSettings["RabbitMQ-ConnectionString"])
+                    });
+            DIConfig.Register();
         }
         public void Application_Error(object sender, EventArgs e)
         {
