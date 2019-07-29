@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Fanex.Athena.LGAPI.Core.Model.DTO.RNGCasino
 {
+    [Serializable]
     public class GameType
     {
         public int GameTypeId { get; set; }
