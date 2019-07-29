@@ -197,23 +197,23 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="SiteConfig\Web.AppSettings.BACKUPMNL.config" />
-    <None Include="SiteConfig\Web.AppSettings.LOCAL.config" />
-    <None Include="SiteConfig\Web.AppSettings.PRO.config" />
-    <None Include="SiteConfig\Web.AppSettings.SIT.config" />
-    <None Include="SiteConfig\Web.AppSettings.UAT.config" />
-    <None Include="SiteConfig\Web.BACKUPMNL.config" />
-    <None Include="SiteConfig\Web.ConnectionStrings.BACKUPMNL.config" />
-    <None Include="SiteConfig\Web.ConnectionStrings.DEV.config" />
-    <None Include="SiteConfig\Web.ConnectionStrings.LOCAL.config" />
-    <None Include="SiteConfig\Web.ConnectionStrings.PRO.config" />
-    <None Include="SiteConfig\Web.ConnectionStrings.SIT.config" />
-    <None Include="SiteConfig\Web.ConnectionStrings.UAT.config" />
-    <None Include="SiteConfig\Web.DEV.config" />
-    <None Include="SiteConfig\Web.LOCAL.config" />
-    <None Include="SiteConfig\Web.PRO.config" />
-    <None Include="SiteConfig\Web.SIT.config" />
-    <None Include="SiteConfig\Web.UAT.config" />
+    <Content Include="SiteConfig\Web.AppSettings.BACKUPMNL.config" />
+    <Content Include="SiteConfig\Web.AppSettings.LOCAL.config" />
+    <Content Include="SiteConfig\Web.AppSettings.PRO.config" />
+    <Content Include="SiteConfig\Web.AppSettings.SIT.config" />
+    <Content Include="SiteConfig\Web.AppSettings.UAT.config" />
+    <Content Include="SiteConfig\Web.BACKUPMNL.config" />
+    <Content Include="SiteConfig\Web.ConnectionStrings.BACKUPMNL.config" />
+    <Content Include="SiteConfig\Web.ConnectionStrings.DEV.config" />
+    <Content Include="SiteConfig\Web.ConnectionStrings.LOCAL.config" />
+    <Content Include="SiteConfig\Web.ConnectionStrings.PRO.config" />
+    <Content Include="SiteConfig\Web.ConnectionStrings.SIT.config" />
+    <Content Include="SiteConfig\Web.ConnectionStrings.UAT.config" />
+    <Content Include="SiteConfig\Web.DEV.config" />
+    <Content Include="SiteConfig\Web.LOCAL.config" />
+    <Content Include="SiteConfig\Web.PRO.config" />
+    <Content Include="SiteConfig\Web.SIT.config" />
+    <Content Include="SiteConfig\Web.UAT.config" />
     <Content Include="Web.AppSettings.config" />
     <Content Include="Web.ConnectionStrings.config" />
   </ItemGroup>
