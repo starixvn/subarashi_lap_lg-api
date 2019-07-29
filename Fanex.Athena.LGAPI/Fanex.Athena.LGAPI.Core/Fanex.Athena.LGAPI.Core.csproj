@@ -31,9 +31,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="ASPXTemplate">
-      <HintPath>..\DLLs\RNGCasino\ASPXTemplate.dll</HintPath>
-    </Reference>
     <Reference Include="CasinoLibrary">
       <HintPath>..\DLLs\RNGCasino\CasinoLibrary.dll</HintPath>
     </Reference>
@@ -42,6 +39,14 @@
     </Reference>
     <Reference Include="Fanex.Logging, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Fanex.Logging.2.0.1\lib\net461\Fanex.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="GotDotNet.ApplicationBlocks.Data, Version=3.1.0.0, Culture=neutral">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DLLs\RNGCasino\GotDotNet.ApplicationBlocks.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="IBCCrypt, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\DLLs\RNGCasino\IBCCrypt.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.ApplicationBlocks.Data">
       <HintPath>..\DLLs\RNGCasino\Microsoft.ApplicationBlocks.Data.dll</HintPath>
@@ -55,18 +60,15 @@
     <Reference Include="Sunplus.Libraries.AOP">
       <HintPath>..\DLLs\RNGCasino\Sunplus.Libraries.AOP.dll</HintPath>
     </Reference>
+    <Reference Include="SunPlus.Library">
+      <HintPath>..\DLLs\RNGCasino\SunPlus.Library.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Net.Http.Formatting">
-      <HintPath>..\DLLs\RNGCasino\System.Net.Http.Formatting.dll</HintPath>
-    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebPages.3.2.7\lib\net45\System.Web.Helpers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Http">
-      <HintPath>..\DLLs\RNGCasino\System.Web.Http.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Mvc, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.7\lib\net45\System.Web.Mvc.dll</HintPath>
@@ -93,8 +95,9 @@
   <ItemGroup>
     <Compile Include="Attributes\CustomAuthAttribute.cs" />
     <Compile Include="Attributes\HandleJsonExceptionAttribute.cs" />
+    <Compile Include="Controllers\RNGCasinoCustomerController.cs" />
     <Compile Include="Controllers\RNGCasinoController.cs" />
-    <Compile Include="Controllers\RngCasinoUpdateSettingMetaModel.cs" />
+    <Compile Include="Model\MetalModel\RNGCasino\RngCasinoUpdateSettingMetaModel.cs" />
     <Compile Include="Model\DTO\RNGCasino\GameKind.cs" />
     <Compile Include="Model\DTO\RNGCasino\GameType.cs" />
     <Compile Include="Model\DTO\RNGCasino\StakeLevel.cs" />
@@ -103,11 +106,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\RNGCasino\ApiMethodOperationHandler.cs" />
     <Compile Include="Service\RNGCasino\BasicInfoApiWrapper.cs" />
+    <Compile Include="Model\MetalModel\RNGCasino\BetSettingCasinoStatusMetaModel.cs" />
+    <Compile Include="Service\RNGCasino\CasinoCustomerService.cs" />
     <Compile Include="Service\RNGCasino\CustomerApiWrapper.cs" />
+    <Compile Include="Model\MetalModel\RNGCasino\CustomerStatusMetaModel.cs" />
     <Compile Include="Service\RNGCasino\IBasicInfoApiWrapper.cs" />
+    <Compile Include="Service\RNGCasino\ICasinoCustomerService.cs" />
     <Compile Include="Service\RNGCasino\ICasinoSettingService.cs" />
     <Compile Include="Service\RNGCasino\CasinoSettingService.cs" />
     <Compile Include="Service\RNGCasino\ICustomerApiWrapper.cs" />
+    <Compile Include="Model\MetalModel\RNGCasino\RNGCasinoUpdateMemberComMetaModel.cs" />
     <Compile Include="Utility\CasinoHelper.cs" />
     <Compile Include="Utility\LogMessageHelper.cs" />
   </ItemGroup>

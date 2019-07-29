@@ -11,17 +11,16 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
     public class RNGCasinoController : Controller
     {
         private readonly ICasinoSettingService _casinoSetting;
-
         public RNGCasinoController(ICasinoSettingService casinoSettingService)
         {
-            _casinoSetting = casinoSettingService ?? new CasinoSettingService(
+                _casinoSetting = casinoSettingService ?? new CasinoSettingService(
                 Logging.Logger.Log,
                 new CustomerApiWrapper(),
                 new BasicInfoApiWrapper());
         }
 
         [HttpPost]
-        public ActionResult RngCasinoSettings(RngCasinoSettingMetaModel model)
+        public ActionResult Settings(RngCasinoSettingMetaModel model)
         {
             var data = _casinoSetting.GetRngCasinoSettings(model.CustId, model.CurrencyID, model.Language);
             return Json(new { Data = data });
@@ -33,5 +32,6 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
             var data = _casinoSetting.UpdateSetting(model);
             return Json(new { Data = data });
         }
+       
     }
 }

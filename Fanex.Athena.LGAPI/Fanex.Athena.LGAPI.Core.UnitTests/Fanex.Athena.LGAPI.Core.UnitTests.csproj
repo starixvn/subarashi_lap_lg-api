@@ -74,6 +74,7 @@
     <Compile Include="HelperTest\FakeHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\ApiMethodOperationHandlerTest.cs" />
+    <Compile Include="Service\CasinoCustomerServiceTest.cs" />
     <Compile Include="Service\CasinoSettingServiceTest.cs" />
   </ItemGroup>
   <ItemGroup>

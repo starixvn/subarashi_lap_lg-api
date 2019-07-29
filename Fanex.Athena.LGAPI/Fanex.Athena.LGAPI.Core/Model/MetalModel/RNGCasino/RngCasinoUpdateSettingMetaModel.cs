@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Fanex.Athena.LGAPI.Core.Model.DTO.RNGCasino;
 
-namespace Fanex.Athena.LGAPI.Core.Controllers
+namespace Fanex.Athena.LGAPI.Core.Model.MetalModel.RNGCasino
 {
     public class RngCasinoUpdateSettingMetaModel
     {

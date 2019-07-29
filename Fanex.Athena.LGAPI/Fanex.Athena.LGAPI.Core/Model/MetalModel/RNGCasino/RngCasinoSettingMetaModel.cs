@@ -11,5 +11,10 @@ namespace Fanex.Athena.LGAPI.Core.Model.MetalModel.RNGCasino
         public int CustId { get; set; }
         public int CurrencyID { get; set; }
         public string Language { get; set; }
+        public int UserId { get; set; }
+
+        public int Status { get; set; }
+
+        public string Ip { get; set; }
     }
 }
