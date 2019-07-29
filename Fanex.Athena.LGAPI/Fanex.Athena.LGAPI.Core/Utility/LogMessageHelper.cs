@@ -26,7 +26,7 @@ namespace Fanex.Athena.LGAPI.Core.Utility
             builder.AppendLine();
             builder.AppendLine("REQUEST INFO");
 
-            var webInfo = GetRequestInfo(HttpContext.Current?.Request);
+            var webInfo = GetRequestInfo();
 
             foreach (var item in webInfo)
             {
@@ -45,11 +45,13 @@ namespace Fanex.Athena.LGAPI.Core.Utility
             builder.AppendLine($"StackTrace: {exception.StackTrace}");
         }
 
-        private static IDictionary<string, object> GetRequestInfo(
-            HttpRequest request)
-            => request == null
-                ? new Dictionary<string, object>()
-                : new Dictionary<string, object>
+        private static IDictionary<string, object> GetRequestInfo()
+        {
+            if (HttpContext.Current != null && HttpContext.Current.Request != null)
+            {
+                var request = HttpContext.Current.Request;
+                return
+                new Dictionary<string, object>
                 {
                     [nameof(request.Url)] = request.Url,
                     [nameof(request.UrlReferrer)] = request.UrlReferrer,
@@ -58,7 +60,9 @@ namespace Fanex.Athena.LGAPI.Core.Utility
                     [nameof(request.UserAgent)] = GetUserAgent(request.ServerVariables),
                     ["Client IP"] = GetClientIP(request.ServerVariables),
                 };
-
+            }
+            return new Dictionary<string, object>();
+        }
         private static string GetClientIP(NameValueCollection serverVariables)
         {
             var clientIP = serverVariables["HTTP_X_FORWARDED_FOR"]

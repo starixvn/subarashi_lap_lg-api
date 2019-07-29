@@ -17,17 +17,19 @@ namespace Fanex.Athena.LGAPI
     {
         protected void Application_Start()
         {
+            LogManager
+       .SetDefaultLogCategory(ConfigurationManager.AppSettings["Fanex.Logging-LogCategory"])
+       .Use(new List<ILogEngine>
+        {
+                         new RabbitMQLogging(ConfigurationManager.AppSettings["RabbitMQ-ConnectionString"])
+        });
+
+            DIConfig.Register();
+
             AreaRegistration.RegisterAllAreas();
             GlobalConfiguration.Configure(WebApiConfig.Register);
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
-            LogManager
-                   .SetDefaultLogCategory(ConfigurationManager.AppSettings["Fanex.Logging-LogCategory"])
-                   .Use(new List<ILogEngine>
-                    {
-                         new RabbitMQLogging(ConfigurationManager.AppSettings["RabbitMQ-ConnectionString"])
-                    });
-            DIConfig.Register();
         }
         public void Application_Error(object sender, EventArgs e)
         {

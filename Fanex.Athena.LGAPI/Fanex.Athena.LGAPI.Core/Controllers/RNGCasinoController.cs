@@ -13,10 +13,7 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
         private readonly ICasinoSettingService _casinoSetting;
         public RNGCasinoController(ICasinoSettingService casinoSettingService)
         {
-            _casinoSetting = casinoSettingService ?? new CasinoSettingService(
-            Logging.Logger.Log,
-            new CustomerApiWrapper(),
-            new BasicInfoApiWrapper());
+            _casinoSetting = casinoSettingService;
         }
 
         [HttpPost]
