@@ -12,5 +12,7 @@ namespace Fanex.Athena.LGAPI.Core.RNGCasino.Service
         IList<GameKind> GetRngCasinoSettings(int custId, int currencyId, string language);
 
         bool UpdateSetting(RngCasinoUpdateSettingMetaModel model);
+
+        bool UpdateStatus(BetSettingCasinoStatusMetaModel model);
     }
 }

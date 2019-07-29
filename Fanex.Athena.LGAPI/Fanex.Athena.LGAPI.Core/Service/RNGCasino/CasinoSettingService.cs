@@ -153,5 +153,10 @@ namespace Fanex.Athena.LGAPI.Core.RNGCasino.Service
 
             return stakeLevelList;
         }
+
+        public bool UpdateStatus(BetSettingCasinoStatusMetaModel model)
+        {
+            return _customerApiWrapper.UpdateCustEnableCasino(model);
+        }
     }
 }
