@@ -46,16 +46,23 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 
         public ObjectCube(ICubeSetting cubeSetting) => _cubeSetting = cubeSetting ?? throw new ArgumentException(nameof(cubeSetting));
 
-        public IEnumerable<IDictionary<string, object>> Query(string query)
+        public IEnumerable<IDictionary<string, object>> Query(string query, IDictionary<string, object> parameters = null)
         {
             if (CubeConnection.State == ConnectionState.Closed)
             {
                 CubeConnection.Open();
             }
+
             CubeCommand.CommandText = query;
+
+            if(parameters != null && parameters.Count > 0)
+            {
+                SetParameters(CubeCommand, parameters);
+            }
 
             IDataReader dataReader = CubeCommand.ExecuteReader();
             var records = new List<IDictionary<string, object>>();
+
             while (dataReader.Read())
             {
                 var record = ParseRowDataToObject(dataReader);
@@ -63,11 +70,6 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
             }
 
             return records;
-        }
-
-        public IEnumerable<IDictionary<string, object>> Query(string query, AdomdParameter[] parameters)
-        {
-            throw new NotImplementedException();
         }
 
         public IDataReader ExecuteReader(string query)
@@ -99,6 +101,14 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
                 _cubeConnection.Close();
                 _cubeConnection.Dispose();
                 _cubeConnection = null;
+            }
+        }
+
+        private static void SetParameters(AdomdCommand adomdCommand, IDictionary<string, object> parameters)
+        {
+            foreach (var param in parameters)
+            {
+                adomdCommand.Parameters.Add(new AdomdParameter(param.Key, param.Value));
             }
         }
 

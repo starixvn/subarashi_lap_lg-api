@@ -19,7 +19,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Bridge.Services
             _baseUrl = baseUrl;
         }
 
-        public async Task<IEnumerable<TResult>> QueryAsync<TResult>(string query, string bridgeUrl = "ssas/query")
+        public async Task<IEnumerable<TResult>> QueryAsync<TResult>(string query, IDictionary<string, object> parameters = null, string bridgeUrl = "ssas/query")
             where TResult : new()
         {
             var result = Activator.CreateInstance<List<TResult>>();
@@ -28,13 +28,12 @@ namespace Fanex.Athena.LGAPI.SSAS.Bridge.Services
             {
                 client.BaseAddress = new Uri(_baseUrl);
                 HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, bridgeUrl);
-                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(new { query, connectionKey = _connectionKey }), Encoding.UTF8, "application/json");
+                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(new { query, connectionKey = _connectionKey, parameters }), Encoding.UTF8, "application/json");
                 var response = await client.SendAsync(requestMessage);
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
-
                     var records = JsonConvert.DeserializeObject<IEnumerable<IDictionary<string, object>>>(content);
                     foreach (var record in records)
                     {

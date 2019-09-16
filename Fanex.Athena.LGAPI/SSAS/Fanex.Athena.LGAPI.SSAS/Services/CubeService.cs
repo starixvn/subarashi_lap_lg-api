@@ -23,11 +23,11 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
             _settingKey = settingKey;
         }
 
-        public IEnumerable<TResult> Query<TResult>(string query)
+        public IEnumerable<TResult> Query<TResult>(string query, IDictionary<string, object> parameters)
             where TResult : new()
         {
             var result = Activator.CreateInstance<List<TResult>>();
-            var records = ObjectCube.Query(query);
+            var records = ObjectCube.Query(query, parameters);
             foreach (var record in records)
             {
                 var obj = record.ToObject<TResult>();

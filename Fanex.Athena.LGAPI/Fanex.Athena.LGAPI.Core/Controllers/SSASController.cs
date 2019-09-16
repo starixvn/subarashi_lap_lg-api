@@ -15,7 +15,7 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
             IEnumerable<IDictionary<string, object>> result = null;
             using (var objCube = new ObjectCube(model.ConnectionKey))
             {
-                result = objCube.Query(model.Query);
+                result = objCube.Query(model.Query, model.Parameters);
 
             }
 
