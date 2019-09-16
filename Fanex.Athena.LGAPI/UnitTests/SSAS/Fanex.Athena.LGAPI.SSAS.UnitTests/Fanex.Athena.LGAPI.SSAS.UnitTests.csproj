@@ -68,6 +68,12 @@
   <ItemGroup>
     <Folder Include="Services\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\SSAS\Fanex.Athena.LGAPI.SSAS\Fanex.Athena.LGAPI.SSAS.csproj">
+      <Project>{9fa4b4d1-87ee-4227-837a-b897e6dabfd8}</Project>
+      <Name>Fanex.Athena.LGAPI.SSAS</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -1,6 +1,5 @@
-﻿using Fanex.Athena.LGAPI.SSAS.Models;
+﻿using Fanex.Athena.LGAPI.SSAS.Bridge.Extensions;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Fanex.Athena.LGAPI.SSAS.Services
@@ -25,14 +24,14 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
         }
 
         public IEnumerable<TResult> Query<TResult>(string query)
-            where TResult : IExtractQueryResult<TResult>, new()
+            where TResult : new()
         {
-            var result = Activator.CreateInstance<IList<TResult>>();
+            var result = Activator.CreateInstance<List<TResult>>();
             var records = ObjectCube.Query(query);
             foreach (var record in records)
             {
-                var obj = Activator.CreateInstance<TResult>();
-                result.Add(obj.ToObject(record));
+                var obj = record.ToObject<TResult>();
+                result.Add(obj);
             }
 
             return result;
@@ -40,7 +39,18 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool isDisposing)
+        {
+            if (isDisposing)
+            {
+                //
+            }
+            _objectCube?.Dispose();
+            _objectCube = null;
         }
     }
 }

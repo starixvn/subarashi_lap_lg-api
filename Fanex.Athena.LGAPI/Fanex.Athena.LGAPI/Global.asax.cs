@@ -5,6 +5,7 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Fanex.Athena.LGAPI.Core.Utility;
+using Fanex.Athena.LGAPI.SSAS.Configuration;
 using Fanex.Logging;
 using Fanex.Logging.Sentry.RavenClient;
 using SharpRaven;
@@ -20,6 +21,8 @@ namespace Fanex.Athena.LGAPI
                 {
                     Dsn = new Dsn(ConfigurationManager.AppSettings["Sentry-Dsn"])
                 }));
+
+            CubeSettingProvider.UseTabularCube();
 
             DIConfig.Register();
 
