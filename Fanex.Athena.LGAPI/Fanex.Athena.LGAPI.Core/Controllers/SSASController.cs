@@ -16,7 +16,6 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
             using (var objCube = new ObjectCube(model.ConnectionKey))
             {
                 result = objCube.Query(model.Query, model.Parameters);
-
             }
 
             return Json(result);
