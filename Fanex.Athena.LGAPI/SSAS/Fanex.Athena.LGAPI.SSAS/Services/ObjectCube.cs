@@ -13,7 +13,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 
         private AdomdConnection _cubeConnection;
 
-        protected AdomdConnection CubeConnection => _cubeConnection ?? (_cubeConnection = new AdomdConnection(this._cubeSetting.ConnectionString));
+        protected AdomdConnection CubeConnection => _cubeConnection ?? (_cubeConnection = new AdomdConnection(_cubeSetting.ConnectionString));
 
         private AdomdCommand _cubeCommand;
 
@@ -38,13 +38,13 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
         {
             if (string.IsNullOrWhiteSpace(settingKey))
             {
-                throw new ArgumentException(nameof(settingKey));
+                throw new ArgumentNullException(nameof(settingKey));
             }
 
-            _cubeSetting = CubeSettingProvider.CubeSettings.FirstOrDefault(_ => _.Key == settingKey) ?? throw new ArgumentException(nameof(_cubeSetting));
+            _cubeSetting = CubeSettingProvider.CubeSettings.FirstOrDefault(_ => _.Key == settingKey) ?? throw new KeyNotFoundException(nameof(_cubeSetting));
         }
 
-        public ObjectCube(ICubeSetting cubeSetting) => _cubeSetting = cubeSetting ?? throw new ArgumentException(nameof(cubeSetting));
+        public ObjectCube(ICubeSetting cubeSetting) => _cubeSetting = cubeSetting ?? throw new KeyNotFoundException(nameof(cubeSetting));
 
         public IEnumerable<IDictionary<string, object>> Query(string query, IDictionary<string, object> parameters = null)
         {
@@ -55,7 +55,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 
             CubeCommand.CommandText = query;
 
-            if(parameters != null && parameters.Count > 0)
+            if (parameters != null && parameters.Count > 0)
             {
                 SetParameters(CubeCommand, parameters);
             }

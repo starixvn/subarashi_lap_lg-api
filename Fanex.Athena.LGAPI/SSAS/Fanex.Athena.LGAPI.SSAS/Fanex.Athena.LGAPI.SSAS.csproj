@@ -83,11 +83,5 @@
     <None Include="Fanex.Athena.LGAPI.SSAS.ruleset" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Fanex.Athena.LGAPI.SSAS.Bridge\Fanex.Athena.LGAPI.SSAS.Bridge.csproj">
-      <Project>{247cb8d9-b614-434f-94c3-ab90cf1ee449}</Project>
-      <Name>Fanex.Athena.LGAPI.SSAS.Bridge</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
