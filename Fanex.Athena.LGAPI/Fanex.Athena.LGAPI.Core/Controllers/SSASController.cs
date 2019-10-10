@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 namespace Fanex.Athena.LGAPI.Core.Controllers
 {
+    [CustomAuth]
     [HandleJsonException]
     public class SSASController : Controller
     {
