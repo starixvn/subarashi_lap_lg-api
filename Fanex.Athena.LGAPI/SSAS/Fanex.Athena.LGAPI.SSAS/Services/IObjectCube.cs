@@ -4,10 +4,10 @@ using System.Data;
 
 namespace Fanex.Athena.LGAPI.SSAS.Services
 {
-    public interface IObjectCube : IDisposable
+    public interface IObjectCube
     {
-        IEnumerable<IDictionary<string, object>> Query(string query, IDictionary<string, object> parameters = null);
+        IEnumerable<IDictionary<string, object>> Query(string queryContent, IDictionary<string, object> parameters = null);
 
-        IDataReader ExecuteReader(string query);
+        IDataReader ExecuteReader(string queryContent);
     }
 }

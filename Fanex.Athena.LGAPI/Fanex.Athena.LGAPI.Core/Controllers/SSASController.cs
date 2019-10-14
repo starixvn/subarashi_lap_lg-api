@@ -14,10 +14,8 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
         public ActionResult Query(QueryInfoMetalModel model)
         {
             IEnumerable<IDictionary<string, object>> result = null;
-            using (var objCube = new ObjectCube(model.ConnectionKey))
-            {
-                result = objCube.Query(model.Query, model.Parameters);
-            }
+            var objCube = new ObjectCube(model.ConnectionKey);
+            result = objCube.Query(model.Query, model.Parameters);
 
             return Json(result);
         }

@@ -75,6 +75,7 @@
     <Compile Include="Configuration\CubeSettingProvider.cs" />
     <Compile Include="Configuration\ICubeSetting.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\ConnectionPoolMananger.cs" />
     <Compile Include="Services\ObjectCube.cs" />
     <Compile Include="Services\IObjectCube.cs" />
   </ItemGroup>

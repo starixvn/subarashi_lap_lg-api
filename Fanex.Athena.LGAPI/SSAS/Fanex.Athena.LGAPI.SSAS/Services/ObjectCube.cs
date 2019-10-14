@@ -9,11 +9,13 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 {
     public class ObjectCube : IObjectCube
     {
-        private ICubeSetting _cubeSetting;
+        private readonly IConnectionPoolManager _connectionPoolManager = ConnectionPoolManager.GetInstance();
 
-        private AdomdConnection _cubeConnection;
+        private readonly ICubeSetting _cubeSetting;
 
-        protected AdomdConnection CubeConnection => _cubeConnection ?? (_cubeConnection = new AdomdConnection(_cubeSetting.ConnectionString));
+        private ConnectionPool _cubeConnection;
+
+        protected ConnectionPool CubeConnection => _cubeConnection ?? (_cubeConnection = _connectionPoolManager.GetConnection(_cubeSetting.ConnectionString));
 
         private AdomdCommand _cubeCommand;
 
@@ -23,7 +25,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
             {
                 if (_cubeCommand == null)
                 {
-                    _cubeCommand = CubeConnection.CreateCommand();
+                    _cubeCommand = CubeConnection.Connection.CreateCommand();
                     if (_cubeSetting.ExecuteTimeout > 0)
                     {
                         _cubeCommand.CommandTimeout = _cubeSetting.ExecuteTimeout;
@@ -46,62 +48,56 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 
         public ObjectCube(ICubeSetting cubeSetting) => _cubeSetting = cubeSetting ?? throw new KeyNotFoundException(nameof(cubeSetting));
 
-        public IEnumerable<IDictionary<string, object>> Query(string query, IDictionary<string, object> parameters = null)
+        public IEnumerable<IDictionary<string, object>> Query(string queryContent, IDictionary<string, object> parameters = null)
         {
-            if (CubeConnection.State == ConnectionState.Closed)
-            {
-                CubeConnection.Open();
-            }
-
-            CubeCommand.CommandText = query;
-
-            if (parameters != null && parameters.Count > 0)
-            {
-                SetParameters(CubeCommand, parameters);
-            }
-
-            IDataReader dataReader = CubeCommand.ExecuteReader();
             var records = new List<IDictionary<string, object>>();
 
-            while (dataReader.Read())
+            try
             {
-                var record = ParseRowDataToObject(dataReader);
-                records.Add(record);
+                CubeCommand.CommandText = queryContent;
+
+                if (parameters != null && parameters.Count > 0)
+                {
+                    SetParameters(CubeCommand, parameters);
+                }
+
+                IDataReader dataReader = CubeCommand.ExecuteReader();
+
+                while (dataReader.Read())
+                {
+                    var record = ParseRowDataToObject(dataReader);
+                    records.Add(record);
+                }
+            }
+            catch
+            {
+                if (_cubeCommand != null)
+                {
+                    _cubeCommand.Dispose();
+                    _cubeCommand = null;
+                }
+
+                if (_cubeConnection?.Connection != null)
+                {
+                    _cubeConnection.Connection.Close(true);
+                    _cubeConnection.Connection.Dispose();
+                    _cubeConnection = null;
+                }
+            }
+            finally
+            {
+                if(CubeConnection?.Connection != null)
+                {
+                    _connectionPoolManager.ReturnConnection(CubeConnection);
+                }
             }
 
             return records;
         }
 
-        public IDataReader ExecuteReader(string query)
+        public IDataReader ExecuteReader(string queryContent)
         {
             throw new NotImplementedException();
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool isDisposing)
-        {
-            if (isDisposing)
-            {
-                _cubeSetting = null;
-            }
-
-            if (_cubeCommand != null)
-            {
-                _cubeCommand.Dispose();
-                _cubeCommand = null;
-            }
-
-            if (_cubeConnection != null)
-            {
-                _cubeConnection.Close();
-                _cubeConnection.Dispose();
-                _cubeConnection = null;
-            }
         }
 
         private static void SetParameters(AdomdCommand adomdCommand, IDictionary<string, object> parameters)
