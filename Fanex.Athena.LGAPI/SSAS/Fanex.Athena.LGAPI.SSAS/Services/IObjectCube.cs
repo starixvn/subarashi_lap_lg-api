@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Collections.Generic;
 
 namespace Fanex.Athena.LGAPI.SSAS.Services
 {
     public interface IObjectCube
     {
         IEnumerable<IDictionary<string, object>> Query(string queryContent, IDictionary<string, object> parameters = null);
-
-        IDataReader ExecuteReader(string queryContent);
     }
 }

@@ -9,32 +9,9 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 {
     public class ObjectCube : IObjectCube
     {
-        private readonly IConnectionPoolManager _connectionPoolManager = ConnectionPoolManager.GetInstance();
+        private readonly Lazy<IConnectionPoolService> _connectionPoolManager = new Lazy<IConnectionPoolService>(() => ConnectionPoolService.GetInstance());
 
         private readonly ICubeSetting _cubeSetting;
-
-        private ConnectionPool _cubeConnection;
-
-        protected ConnectionPool CubeConnection => _cubeConnection ?? (_cubeConnection = _connectionPoolManager.GetConnection(_cubeSetting.ConnectionString));
-
-        private AdomdCommand _cubeCommand;
-
-        protected AdomdCommand CubeCommand
-        {
-            get
-            {
-                if (_cubeCommand == null)
-                {
-                    _cubeCommand = CubeConnection.Connection.CreateCommand();
-                    if (_cubeSetting.ExecuteTimeout > 0)
-                    {
-                        _cubeCommand.CommandTimeout = _cubeSetting.ExecuteTimeout;
-                    }
-                }
-
-                return _cubeCommand;
-            }
-        }
 
         public ObjectCube(string settingKey)
         {
@@ -52,52 +29,39 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
         {
             var records = new List<IDictionary<string, object>>();
 
+            var connectionPool = _connectionPoolManager.Value.GetConnection(_cubeSetting.ConnectionString);
             try
             {
-                CubeCommand.CommandText = queryContent;
-
-                if (parameters != null && parameters.Count > 0)
+                using (var command = connectionPool.Connection.CreateCommand())
                 {
-                    SetParameters(CubeCommand, parameters);
+                    command.CommandTimeout = _cubeSetting.ExecuteTimeout;
+                    command.CommandText = queryContent;
+
+                    if (parameters != null && parameters.Count > 0)
+                    {
+                        SetParameters(command, parameters);
+                    }
+
+                    using (IDataReader dataReader = command.ExecuteReader())
+                    {
+                        while (dataReader.Read())
+                        {
+                            var record = ParseRowDataToObject(dataReader);
+                            records.Add(record);
+                        }
+                    }
                 }
 
-                IDataReader dataReader = CubeCommand.ExecuteReader();
-
-                while (dataReader.Read())
-                {
-                    var record = ParseRowDataToObject(dataReader);
-                    records.Add(record);
-                }
+                _connectionPoolManager.Value.ReturnConnection(connectionPool);
             }
-            catch
+            catch (Exception ex)
             {
-                if (_cubeCommand != null)
-                {
-                    _cubeCommand.Dispose();
-                    _cubeCommand = null;
-                }
-
-                if (_cubeConnection?.Connection != null)
-                {
-                    _cubeConnection.Connection.Close(true);
-                    _cubeConnection.Connection.Dispose();
-                    _cubeConnection = null;
-                }
-            }
-            finally
-            {
-                if(CubeConnection?.Connection != null)
-                {
-                    _connectionPoolManager.ReturnConnection(CubeConnection);
-                }
+                connectionPool.Connection.Close(true);
+                connectionPool.Connection.Dispose();
+                throw ex;
             }
 
             return records;
-        }
-
-        public IDataReader ExecuteReader(string queryContent)
-        {
-            throw new NotImplementedException();
         }
 
         private static void SetParameters(AdomdCommand adomdCommand, IDictionary<string, object> parameters)
