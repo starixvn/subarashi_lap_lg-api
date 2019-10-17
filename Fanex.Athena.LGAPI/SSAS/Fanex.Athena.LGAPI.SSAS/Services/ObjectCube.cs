@@ -9,7 +9,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 {
     public class ObjectCube : IObjectCube
     {
-        private readonly Lazy<IConnectionPoolService> _connectionPoolManager = new Lazy<IConnectionPoolService>(() => ConnectionPoolService.GetInstance());
+        private readonly Lazy<IConnectionPoolService> _connectionPoolService = new Lazy<IConnectionPoolService>(() => ConnectionPoolService.GetInstance());
 
         private readonly ICubeSetting _cubeSetting;
 
@@ -29,7 +29,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
         {
             var records = new List<IDictionary<string, object>>();
 
-            var connectionPool = _connectionPoolManager.Value.GetConnection(_cubeSetting.ConnectionString);
+            var connectionPool = _connectionPoolService.Value.GetConnection(_cubeSetting.ConnectionString);
             try
             {
                 using (var command = connectionPool.Connection.CreateCommand())
@@ -52,7 +52,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
                     }
                 }
 
-                _connectionPoolManager.Value.ReturnConnection(connectionPool);
+                _connectionPoolService.Value.ReturnConnection(connectionPool);
             }
             catch (Exception ex)
             {

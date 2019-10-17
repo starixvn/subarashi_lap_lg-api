@@ -2,14 +2,25 @@
 using Microsoft.AnalysisServices.AdomdClient;
 using System;
 using System.Collections.Concurrent;
+using System.Configuration;
 using System.Data;
 
 namespace Fanex.Athena.LGAPI.SSAS.Services
 {
     public class ConnectionPoolService : IConnectionPoolService
     {
-        private const int DEFAULT_EXPIRE_TIME = 2;
-        private const int DEFAULT_MAX_CONNECTION_POOL = 20;
+        private int? _expireTime;
+        public int ExpireTime
+        {
+            get
+            {
+                if(!_expireTime.HasValue)
+                {  
+                    _expireTime = Convert.ToInt32(ConfigurationManager.AppSettings["SSAS-Connection-Pool-Expire-Time"]);
+                }
+                return _expireTime.Value;
+            }   
+        }
 
         private static Lazy<IConnectionPoolService> lazyInstance = new Lazy<IConnectionPoolService>(() => new ConnectionPoolService());
 
@@ -31,15 +42,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
             }
             var key = entry.ConnectionString;
             entry.RecordCheckIn();
-
-            if (_avalableConnections[key].Count < DEFAULT_MAX_CONNECTION_POOL)
-            {
-                _avalableConnections[key].Push(entry);
-            }
-            else
-            {
-                entry.Connection.Dispose();
-            }
+            _avalableConnections[key].Push(entry);
         }
 
         public ConnectionPool GetConnection(string connectionString)
@@ -49,7 +52,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
             {
                 while (connectionPool == null && stack.TryPop(out ConnectionPool entry))
                 {
-                    if (entry.Connection.State != ConnectionState.Open)
+                    if (entry.Connection.State != ConnectionState.Open || IsExpire(entry, ExpireTime))
                     {
                         entry.Connection.Dispose();
                         continue;
@@ -72,9 +75,9 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
             return connectionPool;
         }
 
-        private static bool IsExpire(ConnectionPool connectionPool)
+        private static bool IsExpire(ConnectionPool connectionPool, int expireTime)
         {
-            return connectionPool.LastCheckedIn.AddMinutes(DEFAULT_EXPIRE_TIME) < DateTime.Now;
+            return connectionPool.LastCheckedIn.AddMinutes(expireTime) < DateTime.Now;
         }
     }
 }
