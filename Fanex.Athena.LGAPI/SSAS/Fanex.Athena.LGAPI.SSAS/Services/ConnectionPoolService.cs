@@ -9,6 +9,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
     public class ConnectionPoolService : IConnectionPoolService
     {
         private const int DEFAULT_EXPIRE_TIME = 2;
+        private const int DEFAULT_MAX_CONNECTION_POOL = 20;
 
         private static Lazy<IConnectionPoolService> lazyInstance = new Lazy<IConnectionPoolService>(() => new ConnectionPoolService());
 
@@ -30,7 +31,15 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
             }
             var key = entry.ConnectionString;
             entry.RecordCheckIn();
-            _avalableConnections[key].Push(entry);
+
+            if (_avalableConnections[key].Count < DEFAULT_MAX_CONNECTION_POOL)
+            {
+                _avalableConnections[key].Push(entry);
+            }
+            else
+            {
+                entry.Connection.Dispose();
+            }
         }
 
         public ConnectionPool GetConnection(string connectionString)
@@ -40,7 +49,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
             {
                 while (connectionPool == null && stack.TryPop(out ConnectionPool entry))
                 {
-                    if (entry.Connection.State != ConnectionState.Open || IsExpire(entry))
+                    if (entry.Connection.State != ConnectionState.Open)
                     {
                         entry.Connection.Dispose();
                         continue;
