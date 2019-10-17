@@ -2,17 +2,13 @@
 using Microsoft.AnalysisServices.AdomdClient;
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Fanex.Athena.LGAPI.SSAS.Services
 {
     public class ConnectionPoolService : IConnectionPoolService
     {
-        private const int DEFAULT_EXPIRE_TIME = 10;
+        private const int DEFAULT_EXPIRE_TIME = 2;
 
         private static Lazy<IConnectionPoolService> lazyInstance = new Lazy<IConnectionPoolService>(() => new ConnectionPoolService());
 
