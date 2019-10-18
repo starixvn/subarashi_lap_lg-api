@@ -11,10 +11,19 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
     public class SSASController : Controller
     {
         [HttpPost]
-        public async Task<ActionResult> Query(QueryInfoMetalModel model)
+        public async Task<ActionResult> Query(QueryMetaModel model)
         {
             var objCube = new ObjectCube(model.ConnectionKey);
-            var result = await Task.Run(() => objCube.Query(model.Query, model.Parameters));
+            var result = await Task.Run(() => objCube.Query(model.Query));
+
+            return Json(result);
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> QueryMultiple(QueryMultipleMetaModel model)
+        {
+            var objCube = new ObjectCube(model.ConnectionKey);
+            var result = await Task.Run(() => objCube.QueryMultiple(model.Queries));
 
             return Json(result);
         }

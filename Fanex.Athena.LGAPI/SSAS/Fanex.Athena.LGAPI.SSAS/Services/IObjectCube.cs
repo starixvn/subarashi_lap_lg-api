@@ -4,6 +4,8 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 {
     public interface IObjectCube
     {
-        IEnumerable<IDictionary<string, object>> Query(string queryContent, IDictionary<string, object> parameters = null);
+        IEnumerable<IDictionary<string, object>> Query(string contentQuery);
+
+        IEnumerable<IEnumerable<IDictionary<string, object>>> QueryMultiple(IEnumerable<string> contentQueries);
     }
 }

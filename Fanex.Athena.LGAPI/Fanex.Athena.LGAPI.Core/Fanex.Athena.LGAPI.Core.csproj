@@ -164,7 +164,9 @@
     <Compile Include="Model\DTO\RNGCasino\StakeLevel.cs" />
     <Compile Include="Model\MetalModel\RNGCasino\GetGameTypeMetalModel.cs" />
     <Compile Include="Model\MetalModel\RNGCasino\RngCasinoSettingMetaModel.cs" />
-    <Compile Include="Model\MetalModel\SSAS\QueryInfoMetalModel.cs" />
+    <Compile Include="Model\MetalModel\SSAS\QueryMultipleMetaModel.cs" />
+    <Compile Include="Model\MetalModel\SSAS\BaseSSASMetaModel.cs" />
+    <Compile Include="Model\MetalModel\SSAS\QueryMetaModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\Exchange\ExchangeClientWrapper.cs" />
     <Compile Include="Service\Exchange\ExchangeBetHistoryService.cs" />

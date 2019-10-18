@@ -1,5 +1,4 @@
 ﻿using Fanex.Athena.LGAPI.SSAS.Configuration;
-using Microsoft.AnalysisServices.AdomdClient;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -25,7 +24,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 
         public ObjectCube(ICubeSetting cubeSetting) => _cubeSetting = cubeSetting ?? throw new KeyNotFoundException(nameof(cubeSetting));
 
-        public IEnumerable<IDictionary<string, object>> Query(string queryContent, IDictionary<string, object> parameters = null)
+        public IEnumerable<IDictionary<string, object>> Query(string contentQuery)
         {
             var records = new List<IDictionary<string, object>>();
 
@@ -35,12 +34,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
                 using (var command = connectionPool.Connection.CreateCommand())
                 {
                     command.CommandTimeout = _cubeSetting.ExecuteTimeout;
-                    command.CommandText = queryContent;
-
-                    if (parameters != null && parameters.Count > 0)
-                    {
-                        SetParameters(command, parameters);
-                    }
+                    command.CommandText = contentQuery;
 
                     using (IDataReader dataReader = command.ExecuteReader())
                     {
@@ -64,11 +58,12 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
             return records;
         }
 
-        private static void SetParameters(AdomdCommand adomdCommand, IDictionary<string, object> parameters)
+        public IEnumerable<IEnumerable<IDictionary<string, object>>> QueryMultiple(IEnumerable<string> contentQueries)
         {
-            foreach (var param in parameters)
+            foreach (var contentQuery in contentQueries)
             {
-                adomdCommand.Parameters.Add(new AdomdParameter(param.Key, param.Value));
+                var result = Query(contentQuery);
+                yield return result;
             }
         }
 

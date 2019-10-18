@@ -54,6 +54,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
                 {
                     if (entry.Connection.State != ConnectionState.Open || IsExpire(entry, ExpireTime))
                     {
+                        entry.Connection.Close(false);
                         entry.Connection.Dispose();
                         continue;
                     }
