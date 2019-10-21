@@ -38,9 +38,11 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 
                     using (IDataReader dataReader = command.ExecuteReader())
                     {
+                        var fields = GetFields(dataReader);
+
                         while (dataReader.Read())
                         {
-                            var record = ParseRowDataToObject(dataReader);
+                            var record = ParseRowDataToObject(dataReader, fields);
                             records.Add(record);
                         }
                     }
@@ -67,15 +69,23 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
             }
         }
 
-        private static IDictionary<string, object> ParseRowDataToObject(IDataReader dataReader)
+        private static IDictionary<string, object> ParseRowDataToObject(IDataReader dataReader, IEnumerable<string> fields)
         {
             var record = new Dictionary<string, object>();
-            for (int i = 0; i < dataReader.FieldCount; i++)
+            foreach (var field in fields)
             {
-                record.Add(dataReader.GetName(i), dataReader.GetValue(i));
+                record.Add(field, dataReader[field]);
             }
 
             return record;
+        }
+
+        private static IEnumerable<string> GetFields(IDataReader dataReader)
+        {
+            for (int i = 0; i < dataReader.FieldCount; i++)
+            {
+                yield return dataReader.GetName(i);
+            }
         }
     }
 }
