@@ -4,11 +4,11 @@ using System.Linq;
 using System.Reflection;
 using System.Web.Compilation;
 using System.Web.Http;
-using System.Web.Http.ExceptionHandling;
 using System.Web.Mvc;
 using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
+using CitiXchangeLibrary;
 using Fanex.Logging;
 
 namespace Fanex.Athena.LGAPI
@@ -37,7 +37,13 @@ namespace Fanex.Athena.LGAPI
         private static void RegisterThirdpartyServices(ContainerBuilder builder)
         {
             builder.RegisterInstance(Logger.Log).As<Logging.ILogger>();
+
+            builder.Register(x => (ICitiXchangeClient)Activator.GetObject(typeof(ICitiXchangeClient), ConfigurationManager.AppSettings["ExchangeProductApiHost"]))
+                .As<ICitiXchangeClient>()
+                .SingleInstance()
+                .ExternallyOwned();
         }
+
         private static Assembly[] GetAssemblies()
         {
             Assembly[] assemblies = null;
@@ -53,6 +59,5 @@ namespace Fanex.Athena.LGAPI
             return assemblies.Where(x => x.FullName.StartsWith("Fanex.Athena.LGAPI", StringComparison.InvariantCulture))
                 .ToArray();
         }
-       
     }
 }
