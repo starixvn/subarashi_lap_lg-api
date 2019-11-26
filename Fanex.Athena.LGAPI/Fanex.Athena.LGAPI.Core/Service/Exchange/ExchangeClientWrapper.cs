@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using CitiXchangeLibrary;
+using Fanex.Athena.LGAPI.Core.Constants;
 using Fanex.Athena.LGAPI.Core.Utility;
 using Fanex.Logging;
 
@@ -8,16 +8,6 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 {
     public class ExchangeClientWrapper : IExchangeClientWrapper
     {
-        private static readonly IDictionary<string, Enviro> EnvironmentMap =
-            new Dictionary<string, Enviro>(StringComparer.OrdinalIgnoreCase)
-        {
-            { "PRO", Enviro.PRD },
-            { "UAT", Enviro.UAT },
-            { "SIT", Enviro.SIT },
-            { "LOCAL", Enviro.POC },
-            { "DEV", Enviro.POC }
-        };
-
         private readonly ICitiXchangeClient _apiClient;
 
         private readonly ILogger _logger;
@@ -33,7 +23,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             GetProfile result = null;
             try
             {
-                result = _apiClient.getProfile(custId, EnvironmentMap[env]);
+                result = _apiClient.getProfile(custId, ExchangeEnvironment.EnvironmentMap[env]);
             }
             catch (Exception exception)
             {
@@ -49,7 +39,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             CommissionInfo result = null;
             try
             {
-                result = _apiClient.updateCommission(custId, newCommission, EnvironmentMap[env]);
+                result = _apiClient.updateCommission(custId, newCommission, ExchangeEnvironment.EnvironmentMap[env]);
             }
             catch (Exception exception)
             {
