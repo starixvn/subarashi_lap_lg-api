@@ -23,13 +23,15 @@ namespace Fanex.Athena.LGAPI
             var config = GlobalConfiguration.Configuration;
             var assemblies = GetAssemblies();
             builder.RegisterAssemblyTypes(assemblies).AsImplementedInterfaces();
-            builder.RegisterControllers(assemblies);
-            builder.RegisterApiControllers(assemblies);
 
             builder.RegisterFilterProvider();
             builder.RegisterWebApiFilterProvider(config);
 
             RegisterThirdpartyServices(builder);
+            RegisterCircuitBreaker(builder);
+
+            builder.RegisterControllers(assemblies);
+            builder.RegisterApiControllers(assemblies);
 
             var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
