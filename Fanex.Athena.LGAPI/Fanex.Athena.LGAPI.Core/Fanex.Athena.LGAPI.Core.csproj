@@ -102,7 +102,7 @@
     <Compile Include="Attributes\CustomAuthAttribute.cs" />
     <Compile Include="Attributes\HandleJsonExceptionAttribute.cs" />
     <Compile Include="Constants\ExchangeEnvironment.cs" />
-    <Compile Include="Controllers\ExchangeClientController.cs" />
+    <Compile Include="Controllers\ExchangeController.cs" />
     <Compile Include="Controllers\ExchangeSettleBetHistoryController.cs" />
     <Compile Include="Controllers\RNGCasinoCustomerController.cs" />
     <Compile Include="Controllers\RNGCasinoController.cs" />
