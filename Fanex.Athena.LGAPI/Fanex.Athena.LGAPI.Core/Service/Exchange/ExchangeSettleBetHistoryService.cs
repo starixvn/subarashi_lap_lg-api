@@ -36,20 +36,27 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             var endDate = dateRange.Item2.ToString(DateTimeFormat);
             var env = ExchangeEnvironment.EnvironmentMap[metaModel.Environment];
 
-            var exchangeResult = _breaker.Execute(() => _apiClient.querySettleBetHistory(metaModel.CustId, startDate, endDate, metaModel.PageNumber, env));
+            var exchangeResult = _breaker.Execute(() => env == Enviro.POC ?
+                CreateFakeData() :
+                _apiClient.querySettleBetHistory(metaModel.CustId, startDate, endDate, metaModel.PageIndex, env));
 
-            return BuildResult(exchangeResult);
+            return BuildResult(exchangeResult, metaModel);
         }
 
-        private static SettleBetHistoryResult BuildResult(SettleBetHistory exchangeResult)
+        private static SettleBetHistoryResult BuildResult(SettleBetHistory exchangeResult, ExchangeGettingVoidedMetaModel metaModel)
         {
             var result = new SettleBetHistoryResult { TotalPage = (int)exchangeResult.totalPage };
             var dataList = new List<SettleBetHistoryItem>();
             if (exchangeResult != null && exchangeResult.resultList != null && exchangeResult.resultList.Any())
             {
+                var hasUserId = metaModel.CustId > 0;
+                var userId = metaModel.CustId.ToString();
+                var hasRefNo = metaModel.RefNo > 0;
+
                 foreach (var item in exchangeResult.resultList)
                 {
-                    if (item.betStatus?.ToLowerInvariant() == VoidedStatus)
+                    if (item.betStatus?.ToLowerInvariant() == VoidedStatus &&
+                        (!hasUserId || item.userId == userId) && (!hasRefNo || item.betId == metaModel.RefNo))
                     {
                         dataList.Add(new SettleBetHistoryItem
                         {
@@ -75,6 +82,22 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             var endDate = startDate.AddDays(1).AddSeconds(-1);
 
             return Tuple.Create(startDate, endDate);
+        }
+
+        private static SettleBetHistory CreateFakeData()
+        {
+            return new SettleBetHistory
+            {
+                currentPage = 1,
+                totalPage = 1,
+                status = CitiStatus.Success,
+                resultList = new List<BetHistoryResultList>
+                {
+                    new BetHistoryResultList{ betId = 1, eventTypeName = "Event Type 1", eventName = "Liverppol vs ManCity", betStatus = "voided", userId = "1063580" },
+                    new BetHistoryResultList{ betId = 2, eventTypeName = "Event Type 2", eventName = "Liverppol vs Tot", betStatus = "voided", userId = "2533651" },
+                    new BetHistoryResultList{ betId = 3, eventTypeName = "Event Type 1", eventName = "Liverppol vs Barca", betStatus = "voided", userId = "3227401" }
+                }
+            };
         }
     }
 }

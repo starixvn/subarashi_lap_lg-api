@@ -8,8 +8,10 @@ namespace Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange
 
         public DateTime SelectedDate { get; set; }
 
-        public int PageNumber { get; set; }
+        public int PageIndex { get; set; }
 
         public string Environment { get; set; }
+
+        public int RefNo { get; set; }
     }
 }
