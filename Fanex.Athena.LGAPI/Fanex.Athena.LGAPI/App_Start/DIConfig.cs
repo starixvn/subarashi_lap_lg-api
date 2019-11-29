@@ -11,7 +11,6 @@ using Autofac.Integration.WebApi;
 using CitiXchangeLibrary;
 using Fanex.Logging;
 using Polly;
-using Polly.CircuitBreaker;
 
 namespace Fanex.Athena.LGAPI
 {
@@ -50,17 +49,10 @@ namespace Fanex.Athena.LGAPI
 
         private static void RegisterCircuitBreaker(ContainerBuilder builder)
         {
-            var exceptionPolicy = Policy.Handle<Exception>()
-                              .CircuitBreaker(
-                                exceptionsAllowedBeforeBreaking: 2,
-                                durationOfBreak: TimeSpan.FromSeconds(2)
-                              );
-
-            CircuitBreakerPolicy<SettleBetHistory> resultPolicy = Policy
+            builder.Register(x => Policy
                 .HandleResult<SettleBetHistory>(r => r.status != CitiStatus.Success).Or<Exception>()
-                .CircuitBreaker(handledEventsAllowedBeforeBreaking: 2, durationOfBreak: TimeSpan.FromSeconds(2));
-
-            builder.RegisterInstance(resultPolicy).As<CircuitBreakerPolicy<SettleBetHistory>>();
+                .CircuitBreaker(handledEventsAllowedBeforeBreaking: 2, durationOfBreak: TimeSpan.FromSeconds(10)))
+                .SingleInstance();
         }
 
         private static Assembly[] GetAssemblies()
