@@ -16,13 +16,13 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         private readonly ILogger _logger;
 
-        private readonly CircuitBreakerPolicy<SettleBetHistory> _breaker;
+        private readonly CircuitBreakerPolicy<BetHistory> _breaker;
 
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const string Gmt8ZoneId = "Taipei Standard Time";
         private const string VoidedStatus = "voided";
 
-        public ExchangeSettleBetHistoryService(ICitiXchangeClient apiClient, ILogger logger, CircuitBreakerPolicy<SettleBetHistory> breaker)
+        public ExchangeSettleBetHistoryService(ICitiXchangeClient apiClient, ILogger logger, CircuitBreakerPolicy<BetHistory> breaker)
         {
             _apiClient = apiClient;
             _logger = logger;
@@ -38,14 +38,14 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
             var exchangeResult = _breaker.Execute(() => env == Enviro.POC ?
                 CreateFakeData() :
-                _apiClient.querySettleBetHistory(metaModel.CustId, startDate, endDate, metaModel.PageIndex, env));
+                _apiClient.queryBetHistory(metaModel.CustId, startDate, endDate, BetStatusHistory.VOIDED, false, metaModel.PageIndex, env));
 
             return BuildResult(exchangeResult, metaModel);
         }
 
-        private static SettleBetHistoryResult BuildResult(SettleBetHistory exchangeResult, ExchangeGettingVoidedMetaModel metaModel)
+        private static SettleBetHistoryResult BuildResult(BetHistory exchangeResult, ExchangeGettingVoidedMetaModel metaModel)
         {
-            var result = new SettleBetHistoryResult { TotalPage = (int)exchangeResult.totalPage };
+            var result = new SettleBetHistoryResult { TotalPage = exchangeResult.totalPage };
             var dataList = new List<SettleBetHistoryItem>();
             if (exchangeResult != null && exchangeResult.resultList != null && exchangeResult.resultList.Any())
             {
@@ -84,9 +84,9 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             return Tuple.Create(startDate, endDate);
         }
 
-        private static SettleBetHistory CreateFakeData()
+        private static BetHistory CreateFakeData()
         {
-            return new SettleBetHistory
+            return new BetHistory
             {
                 currentPage = 1,
                 totalPage = 1,
