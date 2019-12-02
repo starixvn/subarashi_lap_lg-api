@@ -8,7 +8,7 @@ namespace Fanex.Athena.LGAPI.Core.Utility
 {
     public static class LogMessageHelper
     {
-        public static string GenerateMessage(Exception exception)
+        public static string GenerateMessage(Exception exception, int limitedInnerException = 3)
         {
             var messageBuilder = new StringBuilder();
 
@@ -16,7 +16,7 @@ namespace Fanex.Athena.LGAPI.Core.Utility
 
             AddRequestInfo(messageBuilder);
 
-            AddExceptionInfo(messageBuilder, exception);
+            AddExceptionInfo(messageBuilder, exception, limitedInnerException);
 
             return messageBuilder.ToString();
         }
@@ -34,8 +34,7 @@ namespace Fanex.Athena.LGAPI.Core.Utility
             }
         }
 
-
-        private static void AddExceptionInfo(StringBuilder builder, Exception exception)
+        private static void AddExceptionInfo(StringBuilder builder, Exception exception, int limitedInnerException)
         {
             builder.AppendLine();
             builder.AppendLine("EXCEPTION INFO");
@@ -43,6 +42,12 @@ namespace Fanex.Athena.LGAPI.Core.Utility
             builder.AppendLine($"Source: {exception.Source}");
             builder.AppendLine($"TargetSite: {exception.TargetSite}");
             builder.AppendLine($"StackTrace: {exception.StackTrace}");
+
+            if (exception.InnerException != null && limitedInnerException > 0)
+            {
+                limitedInnerException--;
+                AddExceptionInfo(builder, exception.InnerException, limitedInnerException);
+            }
         }
 
         private static IDictionary<string, object> GetRequestInfo()
@@ -63,6 +68,7 @@ namespace Fanex.Athena.LGAPI.Core.Utility
             }
             return new Dictionary<string, object>();
         }
+
         private static string GetClientIP(NameValueCollection serverVariables)
         {
             var clientIP = serverVariables["HTTP_X_FORWARDED_FOR"]

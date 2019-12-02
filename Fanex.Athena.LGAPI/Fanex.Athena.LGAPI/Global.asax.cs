@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
-using System.Web.Optimization;
 using System.Web.Routing;
 using Fanex.Athena.LGAPI.Core.Utility;
 using Fanex.Logging;
-using Fanex.Logging.RabbitMQ;
+using Fanex.Logging.Sentry.RavenClient;
+using SharpRaven;
 
 namespace Fanex.Athena.LGAPI
 {
@@ -17,12 +15,11 @@ namespace Fanex.Athena.LGAPI
     {
         protected void Application_Start()
         {
-            LogManager
-       .SetDefaultLogCategory(ConfigurationManager.AppSettings["Fanex.Logging-LogCategory"])
-       .Use(new List<ILogEngine>
-        {
-                         new RabbitMQLogging(ConfigurationManager.AppSettings["RabbitMQ-ConnectionString"])
-        });
+            LogManager.SetDefaultLogCategory(ConfigurationManager.AppSettings["Fanex.Logging-LogCategory"])
+                .Use(new SentryLogging(new SentryEngineOptions
+                {
+                    Dsn = new Dsn(ConfigurationManager.AppSettings["Sentry-Dsn"])
+                }));
 
             DIConfig.Register();
 
@@ -31,6 +28,7 @@ namespace Fanex.Athena.LGAPI
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
         }
+
         public void Application_Error(object sender, EventArgs e)
         {
             // Code that runs when an unhandled error occurs
@@ -44,8 +42,6 @@ namespace Fanex.Athena.LGAPI
             {
                 LogService.Error(LogMessageHelper.GenerateMessage(exception), exception);
             }
-
-
         }
     }
 }
