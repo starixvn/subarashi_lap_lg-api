@@ -3,8 +3,8 @@ using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 {
-    public interface IExchangeSettleBetHistoryService
+    public interface IExchangeBetHistoryService
     {
-        SettleBetHistoryResult GetVoidedData(ExchangeGettingVoidedMetaModel metaModel);
+        BetHistoryResult GetVoidedData(ExchangeGettingVoidedMetaModel metaModel);
     }
 }

@@ -7,11 +7,11 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
 {
     [CustomAuth]
     [HandleJsonException]
-    public class ExchangeSettleBetHistoryController : Controller
+    public class ExchangeBetHistoryController : Controller
     {
-        private readonly IExchangeSettleBetHistoryService _exchangeService;
+        private readonly IExchangeBetHistoryService _exchangeService;
 
-        public ExchangeSettleBetHistoryController(IExchangeSettleBetHistoryService exchangeService)
+        public ExchangeBetHistoryController(IExchangeBetHistoryService exchangeService)
         {
             _exchangeService = exchangeService;
         }

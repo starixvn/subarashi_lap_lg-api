@@ -103,11 +103,11 @@
     <Compile Include="Attributes\HandleJsonExceptionAttribute.cs" />
     <Compile Include="Constants\ExchangeEnvironment.cs" />
     <Compile Include="Controllers\ExchangeController.cs" />
-    <Compile Include="Controllers\ExchangeSettleBetHistoryController.cs" />
+    <Compile Include="Controllers\ExchangeBetHistoryController.cs" />
     <Compile Include="Controllers\RNGCasinoCustomerController.cs" />
     <Compile Include="Controllers\RNGCasinoController.cs" />
-    <Compile Include="Model\DTO\Exchange\SettleBetHistoryItem.cs" />
-    <Compile Include="Model\DTO\Exchange\SettleBetHistoryResult.cs" />
+    <Compile Include="Model\DTO\Exchange\BetHistoryItem.cs" />
+    <Compile Include="Model\DTO\Exchange\BetHistoryResult.cs" />
     <Compile Include="Model\MetalModel\Exchange\ExchangeBaseMetaModel.cs" />
     <Compile Include="Model\MetalModel\Exchange\ExchangeGettingVoidedMetaModel.cs" />
     <Compile Include="Model\MetalModel\Exchange\ExchangeUpdatingCommissionMetaModel.cs" />
@@ -119,9 +119,9 @@
     <Compile Include="Model\MetalModel\RNGCasino\RngCasinoSettingMetaModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\Exchange\ExchangeClientWrapper.cs" />
-    <Compile Include="Service\Exchange\ExchangeSettleBetHistoryService.cs" />
+    <Compile Include="Service\Exchange\ExchangeBetHistoryService.cs" />
     <Compile Include="Service\Exchange\IExchangeClientWrapper.cs" />
-    <Compile Include="Service\Exchange\IExchangeSettleBetHistoryService.cs" />
+    <Compile Include="Service\Exchange\IExchangeBetHistoryService.cs" />
     <Compile Include="Service\RNGCasino\ApiMethodOperationHandler.cs" />
     <Compile Include="Service\RNGCasino\BasicInfoApiWrapper.cs" />
     <Compile Include="Model\MetalModel\RNGCasino\BetSettingCasinoStatusMetaModel.cs" />

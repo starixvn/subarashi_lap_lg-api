@@ -2,9 +2,9 @@
 
 namespace Fanex.Athena.LGAPI.Core.Model.DTO.Exchange
 {
-    public class SettleBetHistoryResult
+    public class BetHistoryResult
     {
-        public IList<SettleBetHistoryItem> DataList { get; set; }
+        public IList<BetHistoryItem> DataList { get; set; }
 
         public int TotalPage { get; set; }
     }

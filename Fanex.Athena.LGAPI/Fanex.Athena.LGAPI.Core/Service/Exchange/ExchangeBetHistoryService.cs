@@ -10,7 +10,7 @@ using Polly.CircuitBreaker;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 {
-    public class ExchangeSettleBetHistoryService : IExchangeSettleBetHistoryService
+    public class ExchangeBetHistoryService : IExchangeBetHistoryService
     {
         private readonly ICitiXchangeClient _apiClient;
 
@@ -22,14 +22,14 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         private const string Gmt8ZoneId = "Taipei Standard Time";
         private const string VoidedStatus = "voided";
 
-        public ExchangeSettleBetHistoryService(ICitiXchangeClient apiClient, ILogger logger, CircuitBreakerPolicy<BetHistory> breaker)
+        public ExchangeBetHistoryService(ICitiXchangeClient apiClient, ILogger logger, CircuitBreakerPolicy<BetHistory> breaker)
         {
             _apiClient = apiClient;
             _logger = logger;
             _breaker = breaker;
         }
 
-        public SettleBetHistoryResult GetVoidedData(ExchangeGettingVoidedMetaModel metaModel)
+        public BetHistoryResult GetVoidedData(ExchangeGettingVoidedMetaModel metaModel)
         {
             var dateRange = ConvertToGMT8(metaModel.SelectedDate);
             var startDate = dateRange.Item1.ToString(DateTimeFormat);
@@ -43,10 +43,10 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             return BuildResult(exchangeResult, metaModel);
         }
 
-        private static SettleBetHistoryResult BuildResult(BetHistory exchangeResult, ExchangeGettingVoidedMetaModel metaModel)
+        private static BetHistoryResult BuildResult(BetHistory exchangeResult, ExchangeGettingVoidedMetaModel metaModel)
         {
-            var result = new SettleBetHistoryResult { TotalPage = exchangeResult.totalPage };
-            var dataList = new List<SettleBetHistoryItem>();
+            var result = new BetHistoryResult { TotalPage = exchangeResult.totalPage };
+            var dataList = new List<BetHistoryItem>();
             if (exchangeResult != null && exchangeResult.resultList != null && exchangeResult.resultList.Any())
             {
                 var hasUserId = metaModel.CustId > 0;
@@ -58,7 +58,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                     if (item.betStatus?.ToLowerInvariant() == VoidedStatus &&
                         (!hasUserId || item.userId == userId) && (!hasRefNo || item.betId == metaModel.RefNo))
                     {
-                        dataList.Add(new SettleBetHistoryItem
+                        dataList.Add(new BetHistoryItem
                         {
                             RefNo = item.betId,
                             EventType = item.eventTypeName,

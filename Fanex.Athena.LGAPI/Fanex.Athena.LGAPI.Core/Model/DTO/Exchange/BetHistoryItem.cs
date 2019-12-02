@@ -1,6 +1,6 @@
 ﻿namespace Fanex.Athena.LGAPI.Core.Model.DTO.Exchange
 {
-    public class SettleBetHistoryItem
+    public class BetHistoryItem
     {
         public long RefNo { get; set; }
 
