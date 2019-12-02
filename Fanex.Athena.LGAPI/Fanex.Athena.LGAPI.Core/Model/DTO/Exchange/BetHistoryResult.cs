@@ -7,5 +7,7 @@ namespace Fanex.Athena.LGAPI.Core.Model.DTO.Exchange
         public IList<BetHistoryItem> DataList { get; set; }
 
         public int TotalPage { get; set; }
+
+        public int ErrCode { get; set; }
     }
 }

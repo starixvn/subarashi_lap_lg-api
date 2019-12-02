@@ -17,6 +17,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const string Gmt8ZoneId = "Taipei Standard Time";
+        private const int CodeForUM = 101;
 
         public ExchangeBetHistoryService(ICitiXchangeClient apiClient, CircuitBreakerPolicy<BetHistory> breaker)
         {
@@ -26,6 +27,11 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         public BetHistoryResult GetVoidedData(ExchangeGettingVoidedMetaModel metaModel)
         {
+            if (IsUM())
+            {
+                return new BetHistoryResult { DataList = new List<BetHistoryItem>(), ErrCode = CodeForUM };
+            }
+
             var dateRange = ConvertToGMT8(metaModel.SelectedDate);
             var startDate = dateRange.Item1.ToString(DateTimeFormat);
             var endDate = dateRange.Item2.ToString(DateTimeFormat);
@@ -71,6 +77,18 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             var endDate = startDate.AddDays(1).AddSeconds(-1);
 
             return Tuple.Create(startDate, endDate);
+        }
+
+        private bool IsUM()
+        {
+            var result = true;
+            try
+            {
+                result = _apiClient.isUnderMaintainence();
+            }
+            catch { }
+
+            return result;
         }
     }
 }
