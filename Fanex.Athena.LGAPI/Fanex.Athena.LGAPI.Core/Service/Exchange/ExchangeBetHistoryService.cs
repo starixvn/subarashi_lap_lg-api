@@ -5,7 +5,6 @@ using CitiXchangeLibrary;
 using Fanex.Athena.LGAPI.Core.Constants;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
-using Fanex.Logging;
 using Polly.CircuitBreaker;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
@@ -14,18 +13,14 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
     {
         private readonly ICitiXchangeClient _apiClient;
 
-        private readonly ILogger _logger;
-
         private readonly CircuitBreakerPolicy<BetHistory> _breaker;
 
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const string Gmt8ZoneId = "Taipei Standard Time";
-        private const string VoidedStatus = "voided";
 
-        public ExchangeBetHistoryService(ICitiXchangeClient apiClient, ILogger logger, CircuitBreakerPolicy<BetHistory> breaker)
+        public ExchangeBetHistoryService(ICitiXchangeClient apiClient, CircuitBreakerPolicy<BetHistory> breaker)
         {
             _apiClient = apiClient;
-            _logger = logger;
             _breaker = breaker;
         }
 
@@ -36,9 +31,8 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             var endDate = dateRange.Item2.ToString(DateTimeFormat);
             var env = ExchangeEnvironment.EnvironmentMap[metaModel.Environment];
 
-            var exchangeResult = _breaker.Execute(() => env == Enviro.POC ?
-                CreateFakeData() :
-                _apiClient.queryBetHistory(metaModel.CustId, startDate, endDate, BetStatusHistory.VOIDED, false, metaModel.PageIndex, env));
+            var exchangeResult = _breaker.Execute(
+                () => _apiClient.queryBetHistory(metaModel.CustId, startDate, endDate, BetStatusHistory.VOIDED, false, metaModel.PageIndex, env));
 
             return BuildResult(exchangeResult, metaModel);
         }
@@ -53,19 +47,14 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 var userId = metaModel.CustId.ToString();
                 var hasRefNo = metaModel.RefNo > 0;
 
-                foreach (var item in exchangeResult.resultList)
-                {
-                    if (item.betStatus?.ToLowerInvariant() == VoidedStatus &&
-                        (!hasUserId || item.userId == userId) && (!hasRefNo || item.betId == metaModel.RefNo))
+                dataList = exchangeResult.resultList
+                    .Where(item => (!hasUserId || item.userId == userId) && (!hasRefNo || item.betId == metaModel.RefNo))
+                    .Select(item => new BetHistoryItem
                     {
-                        dataList.Add(new BetHistoryItem
-                        {
-                            RefNo = item.betId,
-                            EventType = item.eventTypeName,
-                            Event = item.eventName
-                        });
-                    }
-                }
+                        RefNo = item.betId,
+                        EventType = item.eventTypeName,
+                        Event = item.eventName
+                    }).ToList();
             }
 
             result.DataList = dataList;
@@ -82,22 +71,6 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             var endDate = startDate.AddDays(1).AddSeconds(-1);
 
             return Tuple.Create(startDate, endDate);
-        }
-
-        private static BetHistory CreateFakeData()
-        {
-            return new BetHistory
-            {
-                currentPage = 1,
-                totalPage = 1,
-                status = CitiStatus.Success,
-                resultList = new List<BetHistoryResultList>
-                {
-                    new BetHistoryResultList{ betId = 1, eventTypeName = "Event Type 1", eventName = "Liverppol vs ManCity", betStatus = "voided", userId = "1063580" },
-                    new BetHistoryResultList{ betId = 2, eventTypeName = "Event Type 2", eventName = "Liverppol vs Tot", betStatus = "voided", userId = "2533651" },
-                    new BetHistoryResultList{ betId = 3, eventTypeName = "Event Type 1", eventName = "Liverppol vs Barca", betStatus = "voided", userId = "3227401" }
-                }
-            };
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Web.Compilation;
 using System.Web.Http;
 using System.Web.Mvc;
@@ -9,6 +10,7 @@ using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
 using CitiXchangeLibrary;
+using Fanex.Athena.LGAPI.Core.Utility;
 using Fanex.Logging;
 using Polly;
 
@@ -49,10 +51,33 @@ namespace Fanex.Athena.LGAPI
 
         private static void RegisterCircuitBreaker(ContainerBuilder builder)
         {
+            const int handledEventsAllowedBeforeBreaking = 2;
             builder.Register(x => Policy
                 .HandleResult<BetHistory>(r => r.status != CitiStatus.Success).Or<Exception>()
-                .CircuitBreaker(handledEventsAllowedBeforeBreaking: 2, durationOfBreak: TimeSpan.FromSeconds(10)))
+                .CircuitBreaker(
+                    handledEventsAllowedBeforeBreaking,
+                    durationOfBreak: TimeSpan.FromSeconds(10),
+                    onBreak: OnBreak,
+                    onReset: () => { }))
                 .SingleInstance();
+        }
+
+        private static void OnBreak(DelegateResult<BetHistory> delegateResult, TimeSpan timeSpan)
+        {
+            var messageBuilder = new StringBuilder("Break on Exchange BetHistory");
+            if (delegateResult.Exception != null)
+            {
+                messageBuilder.AppendLine(LogMessageHelper.GenerateMessage(delegateResult.Exception));
+            }
+
+            if (delegateResult.Result != null)
+            {
+                var result = delegateResult.Result;
+                var resultInfo = $"Result: Status={result.status.ToString()} - PageIndex={result.currentPage}";
+                messageBuilder.AppendLine(resultInfo);
+            }
+
+            LogService.Info(messageBuilder.ToString());
         }
 
         private static Assembly[] GetAssemblies()
