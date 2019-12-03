@@ -59,6 +59,7 @@ namespace Fanex.Athena.LGAPI
                     durationOfBreak: TimeSpan.FromSeconds(10),
                     onBreak: OnBreak,
                     onReset: () => { }))
+                .As<ISyncPolicy<BetHistory>>()
                 .SingleInstance();
         }
 

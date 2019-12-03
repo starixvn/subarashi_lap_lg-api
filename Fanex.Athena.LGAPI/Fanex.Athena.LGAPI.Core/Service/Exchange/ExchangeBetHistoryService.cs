@@ -5,7 +5,7 @@ using CitiXchangeLibrary;
 using Fanex.Athena.LGAPI.Core.Constants;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
-using Polly.CircuitBreaker;
+using Polly;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 {
@@ -13,13 +13,13 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
     {
         private readonly ICitiXchangeClient _apiClient;
 
-        private readonly CircuitBreakerPolicy<BetHistory> _breaker;
+        private readonly ISyncPolicy<BetHistory> _breaker;
 
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const string Gmt8ZoneId = "Taipei Standard Time";
         private const int CodeForUM = 101;
 
-        public ExchangeBetHistoryService(ICitiXchangeClient apiClient, CircuitBreakerPolicy<BetHistory> breaker)
+        public ExchangeBetHistoryService(ICitiXchangeClient apiClient, ISyncPolicy<BetHistory> breaker)
         {
             _apiClient = apiClient;
             _breaker = breaker;
