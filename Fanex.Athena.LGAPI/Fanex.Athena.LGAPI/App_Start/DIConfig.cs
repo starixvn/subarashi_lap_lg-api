@@ -52,11 +52,13 @@ namespace Fanex.Athena.LGAPI
         private static void RegisterCircuitBreaker(ContainerBuilder builder)
         {
             const int handledEventsAllowedBeforeBreaking = 2;
+            const int durationOfBreakInSecond = 10;
+
             builder.Register(x => Policy
                 .HandleResult<BetHistory>(r => r.status != CitiStatus.Success).Or<Exception>()
                 .CircuitBreaker(
                     handledEventsAllowedBeforeBreaking,
-                    durationOfBreak: TimeSpan.FromSeconds(10),
+                    durationOfBreak: TimeSpan.FromSeconds(durationOfBreakInSecond),
                     onBreak: OnBreak,
                     onReset: () => { }))
                 .As<ISyncPolicy<BetHistory>>()

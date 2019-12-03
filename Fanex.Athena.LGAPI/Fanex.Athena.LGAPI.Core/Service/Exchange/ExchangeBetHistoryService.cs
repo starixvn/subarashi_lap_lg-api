@@ -42,7 +42,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         private static BetHistoryResult BuildResult(BetHistory exchangeResult, ExchangeGettingVoidedMetaModel metaModel)
         {
-            var result = new BetHistoryResult { TotalPage = exchangeResult.totalPage };
+            var result = new BetHistoryResult();
             var dataList = new List<BetHistoryItem>();
             if (exchangeResult != null && exchangeResult.resultList != null && exchangeResult.resultList.Any())
             {
@@ -58,6 +58,8 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                         EventType = item.eventTypeName,
                         Event = item.eventName
                     }).ToList();
+
+                result.TotalPage = exchangeResult.totalPage;
             }
 
             result.DataList = dataList;
@@ -67,14 +69,14 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         private bool IsUM()
         {
-            var result = true;
             try
             {
-                result = _apiClient.isUnderMaintainence();
+                return _apiClient.isUnderMaintainence();
             }
-            catch { }
-
-            return result;
+            catch
+            {
+                return true;
+            }
         }
     }
 }
