@@ -106,6 +106,8 @@
     <Compile Include="Controllers\ExchangeBetHistoryController.cs" />
     <Compile Include="Controllers\RNGCasinoCustomerController.cs" />
     <Compile Include="Controllers\RNGCasinoController.cs" />
+    <Compile Include="Model\DataDomain\ExchangeSiteId.cs" />
+    <Compile Include="Model\DataDomain\SiteName.cs" />
     <Compile Include="Model\DTO\Exchange\BetHistoryItem.cs" />
     <Compile Include="Model\DTO\Exchange\BetHistoryResult.cs" />
     <Compile Include="Model\MetalModel\Exchange\ExchangeBaseMetaModel.cs" />

@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CitiXchangeLibrary;
 using Fanex.Athena.LGAPI.Core.Constants;
+using Fanex.Athena.LGAPI.Core.Model.DataDomain;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
 using Polly;
@@ -17,6 +19,12 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int CodeForUM = 101;
 
+        private static readonly IDictionary<string, string> _siteNameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { SiteName.OneTwoBet, ExchangeSiteId.OneTwoBet },
+            { SiteName.ALog, ExchangeSiteId.ALog }
+        };
+
         public ExchangeBetHistoryService(ICitiXchangeClient apiClient, ISyncPolicy<BetHistory> breaker)
         {
             _apiClient = apiClient;
@@ -25,9 +33,14 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         public BetHistoryResult GetVoidedData(ExchangeGettingVoidedMetaModel metaModel)
         {
-            if (string.IsNullOrEmpty(metaModel.SiteId) || IsUM())
+            var isValidSiteName = !_siteNameMap.ContainsKey(metaModel.SiteName);
+            if (!isValidSiteName || IsUM())
             {
-                return new BetHistoryResult { DataList = new List<BetHistoryItem>(), ErrCode = CodeForUM };
+                return new BetHistoryResult
+                {
+                    DataList = new List<BetHistoryItem>(),
+                    ErrCode = isValidSiteName ? 0 : CodeForUM
+                };
             }
 
             var startDate = metaModel.SelectedDate.Date.ToString(DateTimeFormat);
@@ -49,9 +62,10 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 var hasUserId = metaModel.CustId > 0;
                 var userId = metaModel.CustId.ToString();
                 var hasRefNo = metaModel.RefNo > 0;
+                var siteId = _siteNameMap[metaModel.SiteName];
 
                 dataList = exchangeResult.resultList
-                    .Where(item => item.extension1 == metaModel.SiteId &&
+                    .Where(item => item.extension1 == siteId &&
                         (!hasUserId || item.userId == userId) && (!hasRefNo || item.betId == metaModel.RefNo))
                     .Select(item => new BetHistoryItem
                     {
