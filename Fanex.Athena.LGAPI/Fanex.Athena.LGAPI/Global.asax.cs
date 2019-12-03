@@ -21,6 +21,8 @@ namespace Fanex.Athena.LGAPI
                     Dsn = new Dsn(ConfigurationManager.AppSettings["Sentry-Dsn"])
                 }));
 
+            LogService.Info("Test Sentry");
+
             DIConfig.Register();
 
             AreaRegistration.RegisterAllAreas();
