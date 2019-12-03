@@ -6,6 +6,7 @@ using Fanex.Athena.LGAPI.Core.Constants;
 using Fanex.Athena.LGAPI.Core.Model.DataDomain;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
+using Fanex.Logging;
 using Polly;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
@@ -33,7 +34,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         public BetHistoryResult GetVoidedData(ExchangeGettingVoidedMetaModel metaModel)
         {
-            var isValidSiteName = !_siteNameMap.ContainsKey(metaModel.SiteName);
+            var isValidSiteName = _siteNameMap.ContainsKey(metaModel.SiteName);
             if (!isValidSiteName || IsUM())
             {
                 return new BetHistoryResult
@@ -59,6 +60,8 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             var dataList = new List<BetHistoryItem>();
             if (exchangeResult != null && exchangeResult.resultList != null && exchangeResult.resultList.Any())
             {
+                LogService.Info("LGAPI - Exchange Result:\n" + string.Join(",", exchangeResult.resultList.Select(x => x.extension1).Distinct()));
+
                 var hasUserId = metaModel.CustId > 0;
                 var userId = metaModel.CustId.ToString();
                 var hasRefNo = metaModel.RefNo > 0;
