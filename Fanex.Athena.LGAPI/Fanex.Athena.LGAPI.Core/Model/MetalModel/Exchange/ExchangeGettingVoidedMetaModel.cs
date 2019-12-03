@@ -13,5 +13,7 @@ namespace Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange
         public string Environment { get; set; }
 
         public int RefNo { get; set; }
+
+        public string SiteId { get; set; }
     }
 }

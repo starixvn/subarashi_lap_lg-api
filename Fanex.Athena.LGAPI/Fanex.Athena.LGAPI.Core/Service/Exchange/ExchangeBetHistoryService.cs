@@ -25,7 +25,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         public BetHistoryResult GetVoidedData(ExchangeGettingVoidedMetaModel metaModel)
         {
-            if (IsUM())
+            if (string.IsNullOrEmpty(metaModel.SiteId) || IsUM())
             {
                 return new BetHistoryResult { DataList = new List<BetHistoryItem>(), ErrCode = CodeForUM };
             }
@@ -51,7 +51,8 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 var hasRefNo = metaModel.RefNo > 0;
 
                 dataList = exchangeResult.resultList
-                    .Where(item => (!hasUserId || item.userId == userId) && (!hasRefNo || item.betId == metaModel.RefNo))
+                    .Where(item => item.extension1 == metaModel.SiteId &&
+                        (!hasUserId || item.userId == userId) && (!hasRefNo || item.betId == metaModel.RefNo))
                     .Select(item => new BetHistoryItem
                     {
                         RefNo = item.betId,
