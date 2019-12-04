@@ -6,7 +6,6 @@ using Fanex.Athena.LGAPI.Core.Constants;
 using Fanex.Athena.LGAPI.Core.Model.DataDomain;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
-using Fanex.Logging;
 using Polly;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
@@ -40,7 +39,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 return new BetHistoryResult
                 {
                     DataList = new List<BetHistoryItem>(),
-                    ErrCode = isValidSiteName ? 0 : CodeForUM
+                    ErrCode = !isValidSiteName ? 0 : CodeForUM
                 };
             }
 
@@ -60,8 +59,6 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             var dataList = new List<BetHistoryItem>();
             if (exchangeResult != null && exchangeResult.resultList != null && exchangeResult.resultList.Any())
             {
-                LogService.Info("LGAPI - Exchange Result:\n" + string.Join(",", exchangeResult.resultList.Select(x => x.extension1).Distinct()));
-
                 var hasUserId = metaModel.CustId > 0;
                 var userId = metaModel.CustId.ToString();
                 var hasRefNo = metaModel.RefNo > 0;

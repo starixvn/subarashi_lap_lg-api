@@ -2,15 +2,11 @@
 
 namespace Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange
 {
-    public class ExchangeGettingVoidedMetaModel
+    public class ExchangeGettingVoidedMetaModel : ExchangeBaseMetaModel
     {
-        public int CustId { get; set; }
-
         public DateTime SelectedDate { get; set; }
 
         public int PageIndex { get; set; }
-
-        public string Environment { get; set; }
 
         public int RefNo { get; set; }
 
