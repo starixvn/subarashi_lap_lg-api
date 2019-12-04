@@ -71,7 +71,9 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                     {
                         RefNo = item.betId,
                         EventType = item.eventTypeName,
-                        Event = item.eventName
+                        Event = item.eventName,
+                        SiteId = item.extension1,
+                        UserId = item.userId
                     }).ToList();
 
                 result.TotalPage = exchangeResult.totalPage;
