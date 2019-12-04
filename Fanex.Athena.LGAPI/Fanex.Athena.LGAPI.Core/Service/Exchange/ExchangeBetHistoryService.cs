@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CitiXchangeLibrary;
 using Fanex.Athena.LGAPI.Core.Constants;
 using Fanex.Athena.LGAPI.Core.Model.DataDomain;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
+using Fanex.Logging;
 using Polly;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
@@ -50,6 +52,8 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             var exchangeResult = _breaker.Execute(
                 () => _apiClient.queryBetHistory(metaModel.CustId, startDate, endDate, BetStatusHistory.VOIDED, false, metaModel.PageIndex, env));
 
+            WriteLogForResult(metaModel, exchangeResult);
+
             return BuildResult(exchangeResult, metaModel);
         }
 
@@ -59,14 +63,11 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             var dataList = new List<BetHistoryItem>();
             if (exchangeResult != null && exchangeResult.resultList != null && exchangeResult.resultList.Any())
             {
-                var hasUserId = metaModel.CustId > 0;
-                var userId = metaModel.CustId.ToString();
                 var hasRefNo = metaModel.RefNo > 0;
                 var siteId = _siteNameMap[metaModel.SiteName];
 
                 dataList = exchangeResult.resultList
-                    .Where(item => item.extension1 == siteId &&
-                        (!hasUserId || item.userId == userId) && (!hasRefNo || item.betId == metaModel.RefNo))
+                    .Where(item => item.extension1 == siteId && (!hasRefNo || item.betId == metaModel.RefNo))
                     .Select(item => new BetHistoryItem
                     {
                         RefNo = item.betId,
@@ -94,6 +95,32 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             {
                 return true;
             }
+        }
+
+        private static void WriteLogForResult(ExchangeGettingVoidedMetaModel metaModel, BetHistory exchangeResult)
+        {
+            var logBuilder = new StringBuilder();
+            logBuilder.AppendLine("PARAM INFO:");
+            logBuilder.AppendLine($"CustId={metaModel.CustId}&SelectedDate={metaModel.SelectedDate}&PageIndex={metaModel.PageIndex}&Environment={metaModel.Environment}");
+
+            logBuilder.AppendLine("RESULT INFO:");
+            if (exchangeResult != null)
+            {
+                logBuilder.AppendLine($"Status={exchangeResult.status}&ItemCount={exchangeResult.resultList?.Count}&TotalPage={exchangeResult.totalPage}");
+
+                if (exchangeResult.resultList != null && exchangeResult.resultList.Any())
+                {
+                    var itemCount = Math.Min(exchangeResult.resultList.Count, 10);
+
+                    for (var i = 0; i < itemCount; i++)
+                    {
+                        var item = exchangeResult.resultList[i];
+                        logBuilder.AppendLine($"UserId={item.userId}&RefNo={item.betId}");
+                    }
+                }
+            }
+
+            LogService.Info(logBuilder.ToString());
         }
     }
 }
