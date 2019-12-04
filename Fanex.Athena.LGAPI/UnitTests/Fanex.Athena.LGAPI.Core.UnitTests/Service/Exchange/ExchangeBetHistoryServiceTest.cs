@@ -101,6 +101,33 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             });
         }
 
+        [Test]
+        public void GetVoidedData_CheckUMButThrowException_UMIsTrueAndReturnCorrectResult()
+        {
+            // Arrange
+            var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
+            metaModel.SiteName = SiteName.OneTwoBet;
+            metaModel.Environment = Environment;
+            metaModel.CustId = 0;
+            metaModel.RefNo = 0;
+
+            _apiClient.isUnderMaintainence().Returns(x => throw new System.Exception());
+
+            var service = new ExchangeBetHistoryService(_apiClient, _breaker);
+
+            // Action
+            var result = service.GetVoidedData(metaModel);
+
+            // Assert
+            Assert.Multiple(() =>
+            {
+                Assert.That(result.ErrCode, Is.EqualTo(CodeForUM));
+                Assert.That(result.DataList.Count, Is.Zero);
+                _apiClient.DidNotReceiveWithAnyArgs()
+                .queryBetHistory(metaModel.CustId, string.Empty, string.Empty, BetStatusHistory.VOIDED, false, metaModel.PageIndex, Enviro.POC);
+            });
+        }
+
         [TestCase(CustIdOfOneTwoBet, 0, true)]
         [TestCase(0, BetIdOfOneTwoBet, true)]
         [TestCase(123, BetIdOfOneTwoBet, false)]
