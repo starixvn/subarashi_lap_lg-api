@@ -9,7 +9,7 @@ namespace Fanex.Athena.LGAPI.Core.Constants
         public static IDictionary<string, Enviro> EnvironmentMap { get; } = new Dictionary<string, Enviro>(StringComparer.OrdinalIgnoreCase)
         {
             { "PRO", Enviro.PRD },
-            { "UAT", Enviro.UAT },
+            { "UAT", Enviro.PRD },
             { "SIT", Enviro.SIT },
             { "LOCAL", Enviro.POC },
             { "DEV", Enviro.POC },

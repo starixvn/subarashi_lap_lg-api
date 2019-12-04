@@ -52,7 +52,7 @@ namespace Fanex.Athena.LGAPI
         private static void RegisterCircuitBreaker(ContainerBuilder builder)
         {
             const int handledEventsAllowedBeforeBreaking = 2;
-            const int durationOfBreakInSecond = 10;
+            const int durationOfBreakInSecond = 2;
 
             builder.Register(x => Policy
                 .HandleResult<BetHistory>(r => r.status != CitiStatus.Success).Or<Exception>()
