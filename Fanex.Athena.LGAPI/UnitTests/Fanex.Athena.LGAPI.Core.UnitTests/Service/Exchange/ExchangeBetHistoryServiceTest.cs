@@ -190,7 +190,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         }
 
         [Test]
-        public void GetVoidedData_ApiDataInCache_NotCallApiClient()
+        public void GetVoidedData_SearchAllAndApiDataInCache_CheckCacheFirstAndNotCallApiClient()
         {
             // Arrange
             var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
@@ -212,6 +212,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             var result = service.GetVoidedData(metaModel);
 
             // Assert
+            _cacheService.Received(1).Get<BetHistory>(cacheKey);
             _apiClient.DidNotReceiveWithAnyArgs()
                 .queryBetHistory(
                 Arg.Any<int>(),
@@ -222,6 +223,38 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
                 metaModel.PageIndex,
                 Enviro.POC);
             Assert.That(result.DataList.Any(), Is.True);
+        }
+
+        [Test]
+        public void GetVoidedData_SearchWithCustId_CallApiClientAndNotCheckApiDataFromCache()
+        {
+            // Arrange
+            var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
+            metaModel.SiteName = SiteName.OneTwoBet;
+            metaModel.Environment = Environment;
+            metaModel.RefNo = 0;
+            metaModel.CustId = 1;
+            metaModel.SelectedDate = DateTime.Now.Date.AddDays(-1);
+
+            _apiClient.isUnderMaintainence().Returns(false);
+
+            var cacheKey = $"ExchangeVoided_{metaModel.SelectedDate.ToString("yyyyMMdd")}_{metaModel.PageIndex}";
+            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService);
+
+            // Action
+            service.GetVoidedData(metaModel);
+
+            // Assert
+            _cacheService.DidNotReceiveWithAnyArgs().Get<BetHistory>(cacheKey);
+            _apiClient.Received(1)
+                .queryBetHistory(
+                1,
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                BetStatusHistory.VOIDED,
+                false,
+                metaModel.PageIndex,
+                Enviro.POC);
         }
 
         [Test]
