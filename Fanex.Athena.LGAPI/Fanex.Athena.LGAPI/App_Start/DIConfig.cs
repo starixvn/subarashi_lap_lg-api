@@ -11,6 +11,8 @@ using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
 using CitiXchangeLibrary;
 using Fanex.Athena.LGAPI.Core.Utility;
+using Fanex.Caching;
+using Fanex.Caching.Redis;
 using Fanex.Logging;
 using Polly;
 
@@ -28,6 +30,7 @@ namespace Fanex.Athena.LGAPI
             builder.RegisterFilterProvider();
             builder.RegisterWebApiFilterProvider(config);
 
+            RegisterCachingService(builder);
             RegisterThirdpartyServices(builder);
             RegisterCircuitBreaker(builder);
 
@@ -81,6 +84,17 @@ namespace Fanex.Athena.LGAPI
             }
 
             LogService.Info(messageBuilder.ToString());
+        }
+
+        private static void RegisterCachingService(ContainerBuilder builder)
+        {
+            builder.Register(x => new RedisCache(new RedisCacheOptions
+            {
+                ConnectionString = ConfigurationManager.AppSettings["RedisConnectionString"],
+                ApplicationName = "LAP.LGAPI"
+            })).As<ICache>().SingleInstance();
+
+            builder.RegisterType<CacheService>().As<ICacheService>().SingleInstance();
         }
 
         private static Assembly[] GetAssemblies()
