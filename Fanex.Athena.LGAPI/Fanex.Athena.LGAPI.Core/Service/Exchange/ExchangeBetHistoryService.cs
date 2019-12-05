@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using CitiXchangeLibrary;
 using Fanex.Athena.LGAPI.Core.Constants;
 using Fanex.Athena.LGAPI.Core.Model.DataDomain;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
 using Fanex.Caching;
+using Fanex.Logging;
 using Polly;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
@@ -22,7 +24,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int CodeForUM = 101;
         private const int SuccessCode = (int)CitiStatus.Success;
-        private const int ExpirationTimeInMinute = 5;
+        private const int ExpirationTimeInMinute = 2;
 
         private static readonly IDictionary<string, string> _siteNameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -54,6 +56,8 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             if (exchangeResult == null)
             {
                 exchangeResult = GetApiData(metaModel);
+
+                WriteLogForResult(metaModel, exchangeResult);
 
                 CacheApiResult(cacheKey, exchangeResult, metaModel);
             }
@@ -131,6 +135,32 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             {
                 return true;
             }
+        }
+
+        private static void WriteLogForResult(ExchangeGettingVoidedMetaModel metaModel, BetHistory exchangeResult)
+        {
+            var logBuilder = new StringBuilder();
+            logBuilder.AppendLine("PARAM INFO:");
+            logBuilder.AppendLine($"CustId={metaModel.CustId}&SelectedDate={metaModel.SelectedDate}&PageIndex={metaModel.PageIndex}&Environment={metaModel.Environment}");
+
+            logBuilder.AppendLine("RESULT INFO:");
+            if (exchangeResult != null)
+            {
+                logBuilder.AppendLine($"Status={exchangeResult.status}&ItemCount={exchangeResult.resultList?.Count}&TotalPage={exchangeResult.totalPage}");
+
+                if (exchangeResult.resultList != null && exchangeResult.resultList.Any())
+                {
+                    var itemCount = Math.Min(exchangeResult.resultList.Count, 10);
+
+                    for (var i = 0; i < itemCount; i++)
+                    {
+                        var item = exchangeResult.resultList[i];
+                        logBuilder.AppendLine($"UserId={item.userId}&RefNo={item.betId}");
+                    }
+                }
+            }
+
+            LogService.Info(logBuilder.ToString());
         }
     }
 }
