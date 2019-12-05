@@ -51,18 +51,24 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 };
             }
 
-            var cacheKey = $"ExchangeVoided_{metaModel.SelectedDate.ToString("yyyyMMdd")}_{metaModel.PageIndex}";
-            var exchangeResult = _cacheService.Get<BetHistory>(cacheKey);
-            if (exchangeResult == null)
+            if (metaModel.CustId == 0)
             {
-                exchangeResult = GetApiData(metaModel);
+                var cacheKey = $"ExchangeVoided_{metaModel.SelectedDate.ToString("yyyyMMdd")}_{metaModel.PageIndex}";
+                var exchangeResult = _cacheService.Get<BetHistory>(cacheKey);
+                if (exchangeResult == null)
+                {
+                    exchangeResult = GetApiData(metaModel);
+                    CacheApiResult(cacheKey, exchangeResult, metaModel);
+                }
 
-                WriteLogForResult(metaModel, exchangeResult);
-
-                CacheApiResult(cacheKey, exchangeResult, metaModel);
+                return BuildResult(exchangeResult, metaModel);
             }
+            else
+            {
+                var apiResult = GetApiData(metaModel);
 
-            return BuildResult(exchangeResult, metaModel);
+                return BuildResult(apiResult, metaModel);
+            }
         }
 
         private BetHistory GetApiData(ExchangeGettingVoidedMetaModel metaModel)
@@ -72,15 +78,18 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             var endDate = selectedDate.AddDays(1).AddSeconds(-1).ToString(DateTimeFormat);
             var env = ExchangeEnvironment.EnvironmentMap[metaModel.Environment];
 
-            return _breaker.Execute(
+            var apiResult = _breaker.Execute(
                 () => _apiClient.queryBetHistory(metaModel.CustId, startDate, endDate, BetStatusHistory.VOIDED, false, metaModel.PageIndex, env));
+
+            WriteLogForResult(metaModel, apiResult);
+
+            return apiResult;
         }
 
         private void CacheApiResult(string cacheKey, BetHistory exchangeResult, ExchangeGettingVoidedMetaModel metaModel)
         {
             var shouldBeCached = exchangeResult.status == CitiStatus.Success &&
-                                DateTime.Compare(DateTime.Now.Date, metaModel.SelectedDate.Date) > 0 &&
-                                metaModel.CustId == 0;
+                                DateTime.Compare(DateTime.Now.Date, metaModel.SelectedDate.Date) > 0;
 
             if (shouldBeCached)
             {
