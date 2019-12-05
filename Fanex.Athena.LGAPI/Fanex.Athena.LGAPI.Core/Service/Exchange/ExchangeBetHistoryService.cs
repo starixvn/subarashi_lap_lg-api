@@ -90,14 +90,26 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         private static BetHistoryResult BuildResult(BetHistory exchangeResult, ExchangeGettingVoidedMetaModel metaModel)
         {
-            var result = new BetHistoryResult();
-            var dataList = new List<BetHistoryItem>();
-            if (exchangeResult != null && exchangeResult.resultList != null && exchangeResult.resultList.Any())
+            var result = new BetHistoryResult { DataList = new List<BetHistoryItem>() };
+
+            if (exchangeResult != null)
+            {
+                result.ErrCode = (int)exchangeResult.status;
+                result.TotalPage = exchangeResult.totalPage;
+                result.DataList = GetDataList(exchangeResult.resultList, metaModel);
+            }
+
+            return result;
+        }
+
+        private static IEnumerable<BetHistoryItem> GetDataList(List<BetHistoryResultList> resultList, ExchangeGettingVoidedMetaModel metaModel)
+        {
+            if (resultList != null && resultList.Any())
             {
                 var hasRefNo = metaModel.RefNo > 0;
                 var siteId = _siteNameMap[metaModel.SiteName];
 
-                dataList = exchangeResult.resultList
+                return resultList
                     .Where(item => item.extension1 == siteId && (!hasRefNo || item.betId == metaModel.RefNo))
                     .Select(item => new BetHistoryItem
                     {
@@ -106,14 +118,10 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                         Event = item.eventName,
                         SiteId = item.extension1,
                         UserId = item.userId
-                    }).ToList();
-
-                result.TotalPage = exchangeResult.totalPage;
+                    });
             }
 
-            result.DataList = dataList;
-
-            return result;
+            return new List<BetHistoryItem>();
         }
 
         private bool IsUM()
