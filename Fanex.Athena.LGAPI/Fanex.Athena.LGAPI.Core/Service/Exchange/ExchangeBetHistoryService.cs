@@ -93,7 +93,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
             if (shouldBeCached)
             {
-                var cachePolicy = new CacheItemOptions().SetSlidingExpiration(TimeSpan.FromMinutes(ExpirationTimeInMinute));
+                var cachePolicy = new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(ExpirationTimeInMinute));
                 _cacheService.Set(cacheKey, exchangeResult, cachePolicy);
             }
         }
