@@ -8,7 +8,7 @@ namespace Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange
 
         public int PageIndex { get; set; }
 
-        public int RefNo { get; set; }
+        public string RefNo { get; set; }
 
         public string SiteName { get; set; }
     }

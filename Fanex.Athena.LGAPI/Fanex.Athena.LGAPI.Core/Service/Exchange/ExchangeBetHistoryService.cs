@@ -42,26 +42,19 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         public BetHistoryResult GetVoidedData(ExchangeGettingVoidedMetaModel metaModel)
         {
             var isValidSiteName = _siteNameMap.ContainsKey(metaModel.SiteName);
-            if (!isValidSiteName || IsUM())
+            var isValidRefno = IsValidRefNo(metaModel.RefNo, out int refNo);
+            if (!isValidSiteName || !isValidRefno || IsUM())
             {
-                return new BetHistoryResult
-                {
-                    DataList = new List<BetHistoryItem>(),
-                    ErrCode = isValidSiteName ? CodeForUM : SuccessCode
-                };
+                var errCode = (isValidSiteName && isValidRefno) ? CodeForUM : SuccessCode;
+                return CreateEmptyResult(errCode);
             }
 
             if (metaModel.CustId == 0)
             {
-                var cacheKey = $"ExchangeVoided_{metaModel.SelectedDate.ToString("yyyyMMdd")}_{metaModel.PageIndex}";
-                var exchangeResult = _cacheService.Get<BetHistory>(cacheKey);
-                if (exchangeResult == null)
-                {
-                    exchangeResult = GetApiData(metaModel);
-                    CacheApiResult(cacheKey, exchangeResult, metaModel);
-                }
+                var dataByDay = GetAllByDay(metaModel);
+                var shouldSearchMore = refNo > 0 && dataByDay.TotalPage > metaModel.PageIndex && !dataByDay.DataList.Any();
 
-                return BuildResult(exchangeResult, metaModel);
+                return shouldSearchMore ? QueryByRefNo(metaModel, dataByDay.TotalPage) : dataByDay;
             }
             else
             {
@@ -69,6 +62,58 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
                 return BuildResult(apiResult, metaModel);
             }
+        }
+
+        private BetHistoryResult QueryByRefNo(ExchangeGettingVoidedMetaModel metaModel, int totalPage)
+        {
+            var pageIndex = metaModel.PageIndex + 1;
+            for (var i = pageIndex; i <= totalPage; i++)
+            {
+                var metaModelByPage = BuildMetaModelByPage(metaModel, i);
+                var searchedResult = GetAllByDay(metaModelByPage);
+
+                if (searchedResult.DataList.Any())
+                {
+                    return searchedResult;
+                }
+            }
+
+            return CreateEmptyResult();
+        }
+
+        private static BetHistoryResult CreateEmptyResult(int errCode = SuccessCode)
+        {
+            return new BetHistoryResult
+            {
+                DataList = new List<BetHistoryItem>(),
+                ErrCode = errCode
+            };
+        }
+
+        private static ExchangeGettingVoidedMetaModel BuildMetaModelByPage(ExchangeGettingVoidedMetaModel metaModel, int pageIndex)
+        {
+            return new ExchangeGettingVoidedMetaModel
+            {
+                CustId = metaModel.CustId,
+                Environment = metaModel.Environment,
+                RefNo = metaModel.RefNo,
+                SelectedDate = metaModel.SelectedDate,
+                SiteName = metaModel.SiteName,
+                PageIndex = pageIndex
+            };
+        }
+
+        private BetHistoryResult GetAllByDay(ExchangeGettingVoidedMetaModel metaModel)
+        {
+            var cacheKey = $"ExchangeVoided_{metaModel.SelectedDate.ToString("yyyyMMdd")}_{metaModel.PageIndex}";
+            var exchangeResult = _cacheService.Get<BetHistory>(cacheKey);
+            if (exchangeResult == null)
+            {
+                exchangeResult = GetApiData(metaModel);
+                CacheApiResult(cacheKey, exchangeResult, metaModel);
+            }
+
+            return BuildResult(exchangeResult, metaModel);
         }
 
         private BetHistory GetApiData(ExchangeGettingVoidedMetaModel metaModel)
@@ -116,11 +161,11 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         {
             if (resultList != null && resultList.Any())
             {
-                var hasRefNo = metaModel.RefNo > 0;
+                var hasRefNo = IsValidRefNo(metaModel.RefNo, out int refNo) && refNo > 0;
                 var siteId = _siteNameMap[metaModel.SiteName];
 
                 return resultList
-                    .Where(item => item.extension1 == siteId && (!hasRefNo || item.betId == metaModel.RefNo))
+                    .Where(item => item.extension1 == siteId && (!hasRefNo || item.betId == refNo))
                     .Select(item => new BetHistoryItem
                     {
                         RefNo = item.betId,
@@ -144,6 +189,13 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             {
                 return true;
             }
+        }
+
+        public static bool IsValidRefNo(string refNo, out int result)
+        {
+            result = 0;
+
+            return string.IsNullOrEmpty(refNo) || int.TryParse(refNo, out result);
         }
 
         private static void WriteLogForResult(ExchangeGettingVoidedMetaModel metaModel, BetHistory exchangeResult)
