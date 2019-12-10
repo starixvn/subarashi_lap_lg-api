@@ -27,8 +27,8 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int CodeForUM = 101;
         private const string Environment = "DEV";
-        private const int BetIdOfOneTwoBet = 1;
-        private const int BetIdOfALog = 2;
+        private const string BetIdOfOneTwoBet = "1";
+        private const string BetIdOfALog = "2";
 
         [SetUp]
         public void SetUp()
@@ -51,11 +51,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         public void GetVoidedData_NotInUMTime_ReturnCorrectResult(string siteName, int expectedRefNo)
         {
             // Arrange
-            var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
-            metaModel.SiteName = siteName;
-            metaModel.Environment = Environment;
-            metaModel.CustId = 0;
-            metaModel.RefNo = 0;
+            var metaModel = CreateMetaModel(siteName: siteName);
 
             _apiClient.isUnderMaintainence().Returns(false);
             FakeApiClient(metaModel);
@@ -73,16 +69,14 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             });
         }
 
-        [TestCase(SiteName.OneTwoBet, true, CodeForUM)]
-        [TestCase("WrongSitename", false, (int)CitiStatus.Success)]
-        public void GetVoidedData_WrongSiteNameOrInUMTime_ReturnCorrectResult(string siteName, bool isUM, int expectedErrCode)
+        [TestCase(SiteName.OneTwoBet, true, "", CodeForUM)]
+        [TestCase("WrongSitename", false, "", (int)CitiStatus.Success)]
+        [TestCase(SiteName.OneTwoBet, false, "abc", (int)CitiStatus.Success)]
+        [TestCase(SiteName.OneTwoBet, false, "5000000000", (int)CitiStatus.Success)]
+        public void GetVoidedData_InvalidParamOrInUMTime_ReturnCorrectResult(string siteName, bool isUM, string refNo, int expectedErrCode)
         {
             // Arrange
-            var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
-            metaModel.SiteName = siteName;
-            metaModel.Environment = Environment;
-            metaModel.CustId = 0;
-            metaModel.RefNo = 0;
+            var metaModel = CreateMetaModel(siteName: siteName, refNo: refNo);
 
             _apiClient.isUnderMaintainence().Returns(isUM);
 
@@ -105,11 +99,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         public void GetVoidedData_CheckUMButThrowException_UMIsTrueAndReturnCorrectResult()
         {
             // Arrange
-            var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
-            metaModel.SiteName = SiteName.OneTwoBet;
-            metaModel.Environment = Environment;
-            metaModel.CustId = 0;
-            metaModel.RefNo = 0;
+            var metaModel = CreateMetaModel();
 
             _apiClient.isUnderMaintainence().Returns(x => throw new System.Exception());
 
@@ -128,15 +118,13 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             });
         }
 
-        [TestCase(0, true)]
+        [TestCase("", true)]
         [TestCase(BetIdOfOneTwoBet, true)]
-        [TestCase(123, false)]
-        public void GetVoidedData_HasFilter_ReturnCorrectResult(int refNo, bool hasData)
+        [TestCase("123", false)]
+        public void GetVoidedData_HasFilter_ReturnCorrectResult(string refNo, bool hasData)
         {
             // Arrange
-            var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
-            metaModel.SiteName = SiteName.OneTwoBet;
-            metaModel.Environment = Environment;
+            var metaModel = CreateMetaModel();
             metaModel.RefNo = refNo;
 
             _apiClient.isUnderMaintainence().Returns(false);
@@ -161,9 +149,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         public void GetVoidedData_CachingByConditionForApiData_CacheDataCorrectly(int custId, int offsetDay, CitiStatus status, bool shouldBeCached)
         {
             // Arrange
-            var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
-            metaModel.SiteName = SiteName.OneTwoBet;
-            metaModel.Environment = Environment;
+            var metaModel = CreateMetaModel();
             metaModel.CustId = custId;
             metaModel.SelectedDate = DateTime.Now.Date.AddDays(offsetDay);
 
@@ -193,11 +179,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         public void GetVoidedData_SearchAllAndApiDataInCache_CheckCacheFirstAndNotCallApiClient()
         {
             // Arrange
-            var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
-            metaModel.SiteName = SiteName.OneTwoBet;
-            metaModel.Environment = Environment;
-            metaModel.CustId = 0;
-            metaModel.RefNo = 0;
+            var metaModel = CreateMetaModel();
             metaModel.SelectedDate = DateTime.Now.Date.AddDays(-1);
 
             _apiClient.isUnderMaintainence().Returns(false);
@@ -229,11 +211,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         public void GetVoidedData_SearchWithCustId_CallApiClientAndNotCheckApiDataFromCache()
         {
             // Arrange
-            var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
-            metaModel.SiteName = SiteName.OneTwoBet;
-            metaModel.Environment = Environment;
-            metaModel.RefNo = 0;
-            metaModel.CustId = 1;
+            var metaModel = CreateMetaModel(custId: 1);
             metaModel.SelectedDate = DateTime.Now.Date.AddDays(-1);
 
             _apiClient.isUnderMaintainence().Returns(false);
@@ -261,17 +239,93 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         public void GetVoidedData_ApiDataReturnEmptyResult_ReturnEmptyDataList()
         {
             // Arrange
-            var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
-            metaModel.SiteName = SiteName.OneTwoBet;
-            metaModel.Environment = Environment;
-            metaModel.RefNo = 0;
-            metaModel.CustId = 0;
+            var metaModel = CreateMetaModel();
             metaModel.SelectedDate = DateTime.Now.Date.AddDays(-1);
 
             _apiClient.isUnderMaintainence().Returns(false);
             var apiData = CreateFakeData();
             apiData.resultList = new List<BetHistoryResultList>();
             FakeApiClient(metaModel, apiData);
+
+            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService);
+
+            // Action
+            var resultData = service.GetVoidedData(metaModel);
+
+            // Assert
+            Assert.That(resultData.DataList, Is.Empty);
+        }
+
+        [Test]
+        public void GetVoidedData_QueryByRefNoAndWithMultiplePage_ReturnCorrectResult()
+        {
+            // Arrange
+            _apiClient.isUnderMaintainence().Returns(false);
+
+            var searchingRefno = "9876789";
+            var metaModel = CreateMetaModel(refNo: searchingRefno);
+            metaModel.SelectedDate = DateTime.Now.Date.AddDays(-1);
+            metaModel.PageIndex = 1;
+            var apiData = CreateFakeData(totalPage: 2);
+            FakeApiClient(metaModel, apiData);
+
+            var metaModelWithpage2 = CreateMetaModel(refNo: searchingRefno);
+            metaModelWithpage2.SelectedDate = metaModel.SelectedDate;
+            metaModelWithpage2.PageIndex = 2;
+            var apiDataForPage2 = CreateFakeData(totalPage: 2, currentPage: 2);
+            apiDataForPage2.resultList = new List<BetHistoryResultList>
+            {
+                new BetHistoryResultList
+                {
+                    betId = int.Parse(searchingRefno),
+                    eventTypeName = "Event Type page 2",
+                    eventName = "Liverppol vs ManCity",
+                    betStatus = "voided",
+                    userId = "1063580",
+                    extension1 = ExchangeSiteId.OneTwoBet
+                }
+            };
+            FakeApiClient(metaModelWithpage2, apiDataForPage2);
+
+            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService);
+
+            // Action
+            var resultData = service.GetVoidedData(metaModel);
+
+            // Assert
+            Assert.That(resultData.DataList.ElementAt(0).RefNo, Is.EqualTo(long.Parse(searchingRefno)));
+        }
+
+        [Test]
+        public void GetVoidedData_QueryByRefNoAndWithMultiplePageButNotFound_ReturnEmptyResult()
+        {
+            // Arrange
+            _apiClient.isUnderMaintainence().Returns(false);
+
+            var searchingRefno = "9876789";
+            var metaModel = CreateMetaModel(refNo: searchingRefno);
+            metaModel.SelectedDate = DateTime.Now.Date.AddDays(-1);
+            metaModel.PageIndex = 1;
+            var apiData = CreateFakeData(totalPage: 2);
+            FakeApiClient(metaModel, apiData);
+
+            var metaModelWithpage2 = CreateMetaModel(refNo: searchingRefno);
+            metaModelWithpage2.SelectedDate = metaModel.SelectedDate;
+            metaModelWithpage2.PageIndex = 2;
+            var apiDataForPage2 = CreateFakeData(totalPage: 2, currentPage: 2);
+            apiDataForPage2.resultList = new List<BetHistoryResultList>
+            {
+                new BetHistoryResultList
+                {
+                    betId = 99,
+                    eventTypeName = "Event Type page 2",
+                    eventName = "Liverppol vs ManCity",
+                    betStatus = "voided",
+                    userId = "1063580",
+                    extension1 = ExchangeSiteId.OneTwoBet
+                }
+            };
+            FakeApiClient(metaModelWithpage2, apiDataForPage2);
 
             var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService);
 
@@ -292,18 +346,29 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
                 .Returns(expectedApiData);
         }
 
-        private static BetHistory CreateFakeData(CitiStatus status = CitiStatus.Success)
+        private static ExchangeGettingVoidedMetaModel CreateMetaModel(string siteName = SiteName.OneTwoBet, string refNo = "", int custId = 0)
+        {
+            var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
+            metaModel.SiteName = siteName;
+            metaModel.Environment = Environment;
+            metaModel.RefNo = refNo;
+            metaModel.CustId = custId;
+
+            return metaModel;
+        }
+
+        private static BetHistory CreateFakeData(CitiStatus status = CitiStatus.Success, int totalPage = 1, int currentPage = 1)
         {
             return new BetHistory
             {
-                currentPage = 1,
-                totalPage = 1,
+                currentPage = currentPage,
+                totalPage = totalPage,
                 status = status,
                 resultList = new List<BetHistoryResultList>
                 {
                     new BetHistoryResultList
                     {
-                        betId = BetIdOfOneTwoBet,
+                        betId = int.Parse(BetIdOfOneTwoBet),
                         eventTypeName = "Event Type 1",
                         eventName = "Liverppol vs ManCity",
                         betStatus = "voided",
@@ -312,7 +377,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
                     },
                     new BetHistoryResultList
                     {
-                        betId = BetIdOfALog,
+                        betId = int.Parse(BetIdOfALog),
                         eventTypeName = "Event Type 1",
                         eventName = "MU vs Barca",
                         betStatus = "voided",
