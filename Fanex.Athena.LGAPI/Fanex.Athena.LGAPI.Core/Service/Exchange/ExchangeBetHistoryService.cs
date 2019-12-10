@@ -40,7 +40,8 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         public BetHistoryResult GetVoidedData(ExchangeGettingVoidedMetaModel metaModel)
         {
             var isValidSiteName = _siteNameMap.ContainsKey(metaModel.SiteName);
-            var isValidRefno = IsValidRefNo(metaModel.RefNo, out int refNo);
+            var refNo = 0;
+            var isValidRefno = string.IsNullOrEmpty(metaModel.RefNo) || int.TryParse(metaModel.RefNo, out refNo);
             if (!isValidSiteName || !isValidRefno || IsUM())
             {
                 var errCode = (isValidSiteName && isValidRefno) ? CodeForUM : SuccessCode;
@@ -157,7 +158,10 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         {
             if (resultList != null && resultList.Any())
             {
-                var hasRefNo = IsValidRefNo(metaModel.RefNo, out int refNo) && refNo > 0;
+                var refNo = 0;
+                var isValidRefno = string.IsNullOrEmpty(metaModel.RefNo) || int.TryParse(metaModel.RefNo, out refNo);
+
+                var hasRefNo = isValidRefno && refNo > 0;
                 var siteId = _siteNameMap[metaModel.SiteName];
 
                 return resultList
@@ -183,13 +187,6 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             {
                 return true;
             }
-        }
-
-        public static bool IsValidRefNo(string refNo, out int result)
-        {
-            result = 0;
-
-            return string.IsNullOrEmpty(refNo) || int.TryParse(refNo, out result);
         }
     }
 }
