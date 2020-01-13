@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>Fanex.Athena.LGAPI.Core.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>Fanex.Athena.LGAPI.Core.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CasinoLibrary">
@@ -149,8 +151,8 @@
     <Compile Include="Controllers\ExchangeBetHistoryController.cs" />
     <Compile Include="Controllers\RNGCasinoCustomerController.cs" />
     <Compile Include="Controllers\RNGCasinoController.cs" />
-    <Compile Include="Model\DataDomain\ExchangeSiteId.cs" />
-    <Compile Include="Model\DataDomain\SiteName.cs" />
+    <Compile Include="Model\DataDomain\ExchangeSiteId.cs" />    <Compile Include="Controllers\SSASController.cs" />
+	<Compile Include="Model\DataDomain\SiteName.cs" />
     <Compile Include="Model\DTO\Exchange\BetHistoryItem.cs" />
     <Compile Include="Model\DTO\Exchange\BetHistoryResult.cs" />
     <Compile Include="Model\MetalModel\Exchange\ExchangeBaseMetaModel.cs" />
@@ -162,6 +164,9 @@
     <Compile Include="Model\DTO\RNGCasino\StakeLevel.cs" />
     <Compile Include="Model\MetalModel\RNGCasino\GetGameTypeMetalModel.cs" />
     <Compile Include="Model\MetalModel\RNGCasino\RngCasinoSettingMetaModel.cs" />
+    <Compile Include="Model\MetalModel\SSAS\QueryMultipleMetaModel.cs" />
+    <Compile Include="Model\MetalModel\SSAS\BaseSSASMetaModel.cs" />
+    <Compile Include="Model\MetalModel\SSAS\QueryMetaModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\Exchange\ExchangeClientWrapper.cs" />
     <Compile Include="Service\Exchange\ExchangeBetHistoryService.cs" />
@@ -183,9 +188,14 @@
     <Compile Include="Utility\LogMessageHelper.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Fanex.Athena.LGAPI.Core.ruleset" />
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\SSAS\Fanex.Athena.LGAPI.SSAS\Fanex.Athena.LGAPI.SSAS.csproj">
+      <Project>{9fa4b4d1-87ee-4227-837a-b897e6dabfd8}</Project>
+      <Name>Fanex.Athena.LGAPI.SSAS</Name>
+    </ProjectReference>
+  </ItemGroup>  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
