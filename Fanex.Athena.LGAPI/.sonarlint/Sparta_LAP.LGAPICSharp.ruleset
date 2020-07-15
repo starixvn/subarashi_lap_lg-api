@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<RuleSet Name="SonarQube - Sparta / LAP.LGAPI Nexcel CSharp" Description="This rule set was automatically generated from SonarQube.&#xD;&#xA;http://sonarqube.nexdev.net/profiles/show?key=cs-sonar-way-80515" ToolsVersion="15.0">
+<RuleSet Name="SonarQube - Legion / LAP.LGAPI Nexcel CSharp" Description="This rule set was automatically generated from SonarQube.&#xD;&#xA;http://sonarqube.nexdev.net/profiles/show?key=cs-sonar-way-80515" ToolsVersion="15.0">
   <Rules AnalyzerId="SonarAnalyzer.CSharp" RuleNamespace="SonarAnalyzer.CSharp">
     <Rule Id="S100" Action="None" />
     <Rule Id="S1006" Action="Warning" />
@@ -278,9 +278,9 @@
     <Rule Id="S3990" Action="None" />
     <Rule Id="S3992" Action="None" />
     <Rule Id="S3993" Action="Warning" />
-    <Rule Id="S3994" Action="Warning" />
+    <Rule Id="S3994" Action="None" />
     <Rule Id="S3995" Action="Warning" />
-    <Rule Id="S3996" Action="Warning" />
+    <Rule Id="S3996" Action="None" />
     <Rule Id="S3997" Action="Warning" />
     <Rule Id="S3998" Action="Warning" />
     <Rule Id="S4000" Action="Warning" />
