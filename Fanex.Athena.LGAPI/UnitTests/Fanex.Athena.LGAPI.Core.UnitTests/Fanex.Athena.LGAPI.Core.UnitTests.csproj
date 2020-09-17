@@ -149,7 +149,7 @@
     <Compile Include="Service\ApiMethodOperationHandlerTest.cs" />
     <Compile Include="Service\CasinoCustomerServiceTest.cs" />
     <Compile Include="Service\CasinoSettingServiceTest.cs" />
-    <Compile Include="Service\Exchange\ExchangeBetHistoryServiceTest.cs" />
+    <Compile Include="Service\Exchange\ExchangeBetHistoryServiceTests.cs" />
     <Compile Include="Service\Exchange\ExchangeClientWrapperTest.cs" />
   </ItemGroup>
   <ItemGroup>

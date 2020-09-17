@@ -58,7 +58,7 @@ namespace Fanex.Athena.LGAPI
             const int durationOfBreakInSecond = 2;
 
             builder.Register(x => Policy
-                .HandleResult<BetHistory>(r => r.status != CitiStatus.Success).Or<Exception>()
+                .HandleResult<BetHistory>(r => r.status != CitiStatus.Success && r.status != 0).Or<Exception>()
                 .CircuitBreaker(
                     handledEventsAllowedBeforeBreaking,
                     durationOfBreak: TimeSpan.FromSeconds(durationOfBreakInSecond),
@@ -79,7 +79,7 @@ namespace Fanex.Athena.LGAPI
             if (delegateResult.Result != null)
             {
                 var result = delegateResult.Result;
-                var resultInfo = $"Result: Status={result.status.ToString()} - PageIndex={result.currentPage}";
+                var resultInfo = $"\r\nResult: Status={result.status.ToString()} - PageIndex={result.currentPage}";
                 messageBuilder.AppendLine(resultInfo);
             }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using CitiXchangeLibrary;
 using Fanex.Athena.LGAPI.Core.Constants;
 using Fanex.Athena.LGAPI.Core.Model.DataDomain;
@@ -14,20 +15,20 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
     public class ExchangeBetHistoryService : IExchangeBetHistoryService
     {
         private readonly ICitiXchangeClient _apiClient;
-
         private readonly ISyncPolicy<BetHistory> _breaker;
-
         private readonly ICacheService _cacheService;
 
-        private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int CodeForUM = 101;
-        private const int SuccessCode = (int)CitiStatus.Success;
         private const int ExpirationTimeInMinute = 60;
-
+        private const int PageSize = 2000;
+        private const int SuccessCode = (int)CitiStatus.Success;
+        protected const string DateTimeFormat = "yyyy-MM-dd HH:mm";
+        private const int DelayTime = 1000;
+        private static readonly int[] reportTypes = new[] { ExchangeReportConstants.FancyBet, ExchangeReportConstants.Bookmaker };
         private static readonly IDictionary<string, string> _siteNameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            { SiteName.OneTwoBet, ExchangeSiteId.OneTwoBet },
-            { SiteName.ALog, ExchangeSiteId.ALog }
+            [SiteName.OneTwoBet] = ExchangeSiteId.OneTwoBet,
+            [SiteName.ALog] = ExchangeSiteId.ALog
         };
 
         public ExchangeBetHistoryService(ICitiXchangeClient apiClient, ISyncPolicy<BetHistory> breaker, ICacheService cacheService)
@@ -39,142 +40,50 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         public BetHistoryResult GetVoidedData(ExchangeGettingVoidedMetaModel metaModel)
         {
-            var isValidSiteName = _siteNameMap.ContainsKey(metaModel.SiteName);
-            var refNo = 0;
-            var isValidRefno = string.IsNullOrEmpty(metaModel.RefNo) || int.TryParse(metaModel.RefNo, out refNo);
-            if (!isValidSiteName || !isValidRefno || IsUM())
+            if (IsUM())
             {
-                var errCode = (isValidSiteName && isValidRefno) ? CodeForUM : SuccessCode;
-                return CreateEmptyResult(errCode);
+                return new BetHistoryResult(CodeForUM);
             }
 
-            if (metaModel.CustId == 0)
+            if (!IsValidParam(metaModel))
             {
-                var dataByDay = GetAllByDay(metaModel);
-                var shouldSearchMore = refNo > 0 && dataByDay.TotalPage > metaModel.PageIndex && !dataByDay.DataList.Any();
-
-                return shouldSearchMore ? QueryByRefNo(metaModel, dataByDay.TotalPage) : dataByDay;
-            }
-            else
-            {
-                var apiResult = GetApiData(metaModel);
-
-                return BuildResult(apiResult, metaModel);
-            }
-        }
-
-        private BetHistoryResult QueryByRefNo(ExchangeGettingVoidedMetaModel metaModel, int totalPage)
-        {
-            var pageIndex = metaModel.PageIndex + 1;
-            for (var i = pageIndex; i <= totalPage; i++)
-            {
-                var metaModelByPage = BuildMetaModelByPage(metaModel, i);
-                var searchedResult = GetAllByDay(metaModelByPage);
-
-                if (searchedResult.DataList.Any())
-                {
-                    return searchedResult;
-                }
+                return new BetHistoryResult(SuccessCode);
             }
 
-            return CreateEmptyResult();
-        }
+            var totalItemsByType = reportTypes.Select(r => GetTotalItems(metaModel, r)).ToList();
+            var failed = totalItemsByType.FirstOrDefault(t => !IsSuccess(t.Status));
+            if (failed != null)
+            {
+                return new BetHistoryResult(failed.Status);
+            }
 
-        private static BetHistoryResult CreateEmptyResult(int errCode = SuccessCode)
-        {
+            GetAllDataByCustId(metaModel, totalItemsByType);
+
+            var siteId = _siteNameMap[metaModel.SiteName];
+            var key = $"ExchangeVoided_{metaModel.SelectedDateStr}_{metaModel.CustId}_{siteId}";
+            var apiData = _cacheService.Get<IEnumerable<BetHistoryResultList>>(key) ?? GetCustDataBySite(metaModel, totalItemsByType);
+
+            if (apiData == null)
+            {
+                return new BetHistoryResult(SuccessCode);
+            }
+
+            var refNo = string.IsNullOrEmpty(metaModel.RefNo) ? 0 : long.Parse(metaModel.RefNo);
+            var dataList = refNo > 0 ? apiData.Where(d => d.betId == refNo) : apiData;
+
             return new BetHistoryResult
             {
-                DataList = new List<BetHistoryItem>(),
-                ErrCode = errCode
+                ErrCode = SuccessCode,
+                DataList = dataList.Skip((metaModel.PageIndex - 1) * PageSize).Take(PageSize).Select(item => Create(item)),
+                TotalPage = Math.Ceiling((decimal)dataList.Count() / PageSize)
             };
         }
 
-        private static ExchangeGettingVoidedMetaModel BuildMetaModelByPage(ExchangeGettingVoidedMetaModel metaModel, int pageIndex)
+        private static bool IsValidParam(ExchangeGettingVoidedMetaModel metaModel)
         {
-            return new ExchangeGettingVoidedMetaModel
-            {
-                CustId = metaModel.CustId,
-                Environment = metaModel.Environment,
-                RefNo = metaModel.RefNo,
-                SelectedDate = metaModel.SelectedDate,
-                SiteName = metaModel.SiteName,
-                PageIndex = pageIndex
-            };
-        }
-
-        private BetHistoryResult GetAllByDay(ExchangeGettingVoidedMetaModel metaModel)
-        {
-            var cacheKey = $"ExchangeVoided_{metaModel.SelectedDate.ToString("yyyyMMdd")}_{metaModel.PageIndex}";
-            var exchangeResult = _cacheService.Get<BetHistory>(cacheKey);
-            if (exchangeResult == null)
-            {
-                exchangeResult = GetApiData(metaModel);
-                CacheApiResult(cacheKey, exchangeResult, metaModel);
-            }
-
-            return BuildResult(exchangeResult, metaModel);
-        }
-
-        private BetHistory GetApiData(ExchangeGettingVoidedMetaModel metaModel)
-        {
-            var selectedDate = metaModel.SelectedDate.Date;
-            var startDate = selectedDate.ToString(DateTimeFormat);
-            var endDate = selectedDate.AddDays(1).AddSeconds(-1).ToString(DateTimeFormat);
-            var env = ExchangeEnvironment.EnvironmentMap[metaModel.Environment];
-
-            var apiResult = _breaker.Execute(
-                () => _apiClient.queryBetHistory(metaModel.CustId, startDate, endDate, BetStatusHistory.VOIDED, false, metaModel.PageIndex, env));
-
-            return apiResult;
-        }
-
-        private void CacheApiResult(string cacheKey, BetHistory exchangeResult, ExchangeGettingVoidedMetaModel metaModel)
-        {
-            var shouldBeCached = exchangeResult.status == CitiStatus.Success &&
-                                DateTime.Compare(DateTime.Now.Date, metaModel.SelectedDate.Date) > 0;
-
-            if (shouldBeCached)
-            {
-                var cachePolicy = new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(ExpirationTimeInMinute));
-                _cacheService.Set(cacheKey, exchangeResult, cachePolicy);
-            }
-        }
-
-        private static BetHistoryResult BuildResult(BetHistory exchangeResult, ExchangeGettingVoidedMetaModel metaModel)
-        {
-            var result = new BetHistoryResult { DataList = new List<BetHistoryItem>() };
-
-            if (exchangeResult != null)
-            {
-                result.ErrCode = (int)exchangeResult.status;
-                result.TotalPage = exchangeResult.totalPage;
-                result.DataList = GetDataList(exchangeResult.resultList, metaModel);
-            }
-
-            return result;
-        }
-
-        private static IEnumerable<BetHistoryItem> GetDataList(List<BetHistoryResultList> resultList, ExchangeGettingVoidedMetaModel metaModel)
-        {
-            if (resultList != null && resultList.Any())
-            {
-                var refNo = 0;
-                var isValidRefno = string.IsNullOrEmpty(metaModel.RefNo) || int.TryParse(metaModel.RefNo, out refNo);
-
-                var hasRefNo = isValidRefno && refNo > 0;
-                var siteId = _siteNameMap[metaModel.SiteName];
-
-                return resultList
-                    .Where(item => item.extension1 == siteId && (!hasRefNo || item.betId == refNo))
-                    .Select(item => new BetHistoryItem
-                    {
-                        RefNo = item.betId,
-                        EventType = item.eventTypeName,
-                        Event = item.eventName
-                    });
-            }
-
-            return new List<BetHistoryItem>();
+            var isValidSiteName = _siteNameMap.ContainsKey(metaModel.SiteName);
+            var isValidRefno = string.IsNullOrEmpty(metaModel.RefNo) || int.TryParse(metaModel.RefNo, out _);
+            return isValidSiteName && isValidRefno;
         }
 
         private bool IsUM()
@@ -188,5 +97,114 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 return true;
             }
         }
+
+        private ReportTypeItemsDTO GetTotalItems(ExchangeGettingVoidedMetaModel metaModel, int reportType)
+        {
+            var param = metaModel.Clone();
+            param.ReportType = reportType;
+            param.PageIndex = 1;
+
+            var result = new ReportTypeItemsDTO { ReportType = reportType };
+            var env = ExchangeEnvironment.EnvironmentMap[param.Environment];
+            var apiData = _breaker.Execute(() => QueryBetHistory(param, env));
+            if (apiData != null)
+            {
+                result.Status = (int)apiData.status;
+                result.TotalPage = apiData.totalPage;
+            }
+
+            return result;
+        }
+
+        private BetHistory QueryBetHistory(ExchangeGettingVoidedMetaModel param, Enviro env)
+        {
+            FormatAPIParam(param);
+            var apiResult = _apiClient.queryBetHistory(param.CustId, param.StartTime, param.EndTime, BetStatusHistory.VOIDED, true, param.PageIndex, param.ReportType, env);
+            Thread.Sleep(DelayTime);
+            return apiResult;
+        }
+
+        private static void FormatAPIParam(ExchangeGettingVoidedMetaModel param)
+        {
+            var selectedDate = param.SelectedDate.Date;
+            param.StartTime = selectedDate.ToString(DateTimeFormat);
+            param.EndTime = selectedDate.AddDays(1).AddSeconds(-1).ToString(DateTimeFormat);
+        }
+
+        private static bool IsSuccess(int status) => status == SuccessCode || status == 0;
+
+        private void GetAllDataByCustId(ExchangeGettingVoidedMetaModel metaModel, List<ReportTypeItemsDTO> totalItemsByType)
+        {
+            var cacheKey = $"ExchangeVoided_{metaModel.SelectedDateStr}_{metaModel.CustId}_0_1";
+            if (_cacheService.Get<BetHistory>(cacheKey) != null)
+            {
+                return;
+            }
+
+            var param = metaModel.Clone();
+            var env = ExchangeEnvironment.EnvironmentMap[param.Environment];
+
+            for (var i = 0; i < reportTypes.Length; i++)
+            {
+                var totalPage = totalItemsByType[i].TotalPage;
+                var t = reportTypes[i];
+                param.ReportType = t;
+                param.PageIndex = 1;
+
+                while (param.PageIndex <= totalPage)
+                {
+                    var apiData = _breaker.Execute(() => QueryBetHistory(param, env));
+                    var shouldBeCached = IsSuccess((int)apiData.status) && DateTime.Compare(DateTime.Now.Date, param.SelectedDate.Date) > 0;
+                    cacheKey = $"ExchangeVoided_{param.SelectedDateStr}_{param.CustId}_{param.ReportType}_{param.PageIndex}";
+
+                    if (shouldBeCached)
+                    {
+                        var cachePolicy = new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(ExpirationTimeInMinute));
+                        _cacheService.Set(cacheKey, apiData, cachePolicy);
+                    }
+
+                    param.PageIndex++;
+                }
+            }
+        }
+
+        private IEnumerable<BetHistoryResultList> GetCustDataBySite(ExchangeGettingVoidedMetaModel param, List<ReportTypeItemsDTO> totalItemsByType)
+        {
+            var siteId = _siteNameMap[param.SiteName];
+            IEnumerable<BetHistoryResultList> dataList = new List<BetHistoryResultList>();
+
+            for (var i = 0; i < reportTypes.Length; i++)
+            {
+                var t = reportTypes[i];
+                var totalPage = totalItemsByType[i].TotalPage;
+                var pageIndex = 1;
+                while (pageIndex <= totalPage)
+                {
+                    var cacheKey = $"ExchangeVoided_{param.SelectedDateStr}_{param.CustId}_{t}_{pageIndex}";
+                    var apiData = _cacheService.Get<BetHistory>(cacheKey);
+                    pageIndex++;
+
+                    if (apiData == null)
+                    {
+                        continue;
+                    }
+
+                    dataList = dataList.Union(apiData.resultList.Where(r => r.extension1 == siteId));
+                }
+            }
+
+            var key = $"ExchangeVoided_{param.SelectedDateStr}_{param.CustId}_{siteId}";
+            var cachePolicy = new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(ExpirationTimeInMinute));
+            _cacheService.Set<IEnumerable<BetHistoryResultList>>(key, dataList.ToList(), cachePolicy);
+            return dataList;
+        }
+
+        private static BetHistoryItem Create(BetHistoryResultList item)
+            => new BetHistoryItem
+            {
+                RefNo = item.betId,
+                EventType = item.eventTypeName,
+                Event = item.eventName
+            };
     }
 }

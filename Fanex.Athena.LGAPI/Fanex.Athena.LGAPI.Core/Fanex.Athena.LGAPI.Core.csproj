@@ -71,6 +71,9 @@
     <Reference Include="NetUtility">
       <HintPath>..\DLLs\RNGCasino\NetUtility.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Pipelines.Sockets.Unofficial, Version=1.0.0.0, Culture=neutral, PublicKeyToken=42ea0a778e13fbe2, processorArchitecture=MSIL">
       <HintPath>..\packages\Pipelines.Sockets.Unofficial.1.0.7\lib\net461\Pipelines.Sockets.Unofficial.dll</HintPath>
     </Reference>
@@ -151,10 +154,13 @@
     <Compile Include="Controllers\ExchangeBetHistoryController.cs" />
     <Compile Include="Controllers\RNGCasinoCustomerController.cs" />
     <Compile Include="Controllers\RNGCasinoController.cs" />
-    <Compile Include="Model\DataDomain\ExchangeSiteId.cs" />    <Compile Include="Controllers\SSASController.cs" />
-	<Compile Include="Model\DataDomain\SiteName.cs" />
+    <Compile Include="Model\DataDomain\ExchangeReportConstants.cs" />
+    <Compile Include="Model\DataDomain\ExchangeSiteId.cs" />
+    <Compile Include="Controllers\SSASController.cs" />
+    <Compile Include="Model\DataDomain\SiteName.cs" />
     <Compile Include="Model\DTO\Exchange\BetHistoryItem.cs" />
     <Compile Include="Model\DTO\Exchange\BetHistoryResult.cs" />
+    <Compile Include="Model\DTO\Exchange\ReportTypeItemsDTO.cs" />
     <Compile Include="Model\MetalModel\Exchange\ExchangeBaseMetaModel.cs" />
     <Compile Include="Model\MetalModel\Exchange\ExchangeGettingVoidedMetaModel.cs" />
     <Compile Include="Model\MetalModel\Exchange\ExchangeUpdatingCommissionMetaModel.cs" />
@@ -185,6 +191,7 @@
     <Compile Include="Service\RNGCasino\ICustomerApiWrapper.cs" />
     <Compile Include="Model\MetalModel\RNGCasino\RNGCasinoUpdateMemberComMetaModel.cs" />
     <Compile Include="Utility\CasinoHelper.cs" />
+    <Compile Include="Utility\DateTimeHelper.cs" />
     <Compile Include="Utility\LogMessageHelper.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -197,5 +204,6 @@
       <Project>{9fa4b4d1-87ee-4227-837a-b897e6dabfd8}</Project>
       <Name>Fanex.Athena.LGAPI.SSAS</Name>
     </ProjectReference>
-  </ItemGroup>  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
