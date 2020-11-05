@@ -1,8 +1,8 @@
-﻿using Fanex.Athena.LGAPI.SSAS.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Fanex.Athena.LGAPI.SSAS.Configuration;
 
 namespace Fanex.Athena.LGAPI.SSAS.Services
 {
@@ -50,11 +50,11 @@ namespace Fanex.Athena.LGAPI.SSAS.Services
 
                 _connectionPoolService.Value.ReturnConnection(connectionPool);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 connectionPool.Connection.Close(true);
                 connectionPool.Connection.Dispose();
-                throw ex;
+                throw;
             }
 
             return records;

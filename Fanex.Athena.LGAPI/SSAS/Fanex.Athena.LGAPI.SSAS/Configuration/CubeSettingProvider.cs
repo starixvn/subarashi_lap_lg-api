@@ -5,6 +5,8 @@ namespace Fanex.Athena.LGAPI.SSAS.Configuration
 {
     public static class CubeSettingProvider
     {
+        private const int ExecuteTimeout = 120;
+
         public static IList<ICubeSetting> CubeSettings { private set; get; }
 
         static CubeSettingProvider()
@@ -23,7 +25,7 @@ namespace Fanex.Athena.LGAPI.SSAS.Configuration
                     {
                         Key = conn.Name,
                         ConnectionString = conn.ConnectionString,
-                        ExecuteTimeout = 120
+                        ExecuteTimeout = ExecuteTimeout
                     });
                 }
             }

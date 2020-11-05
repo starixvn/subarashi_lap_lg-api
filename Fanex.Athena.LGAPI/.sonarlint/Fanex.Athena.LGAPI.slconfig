@@ -2,11 +2,11 @@
   "ServerUri": "http://sonarqube.nexdev.net",
   "Organization": null,
   "ProjectKey": "Sparta_LAP.LGAPI",
-  "ProjectName": "Sparta / LAP.LGAPI",
+  "ProjectName": "Legion / LAP.LGAPI",
   "Profiles": {
     "CSharp": {
       "ProfileKey": "cs-sonar-way-80515",
-      "ProfileTimestamp": "2019-03-19T14:46:51+07:00"
+      "ProfileTimestamp": "2019-10-01T13:55:11+07:00"
     }
   }
 }
