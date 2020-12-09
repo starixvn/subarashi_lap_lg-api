@@ -37,14 +37,16 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         public CommissionInfo UpdateCommission(int custId, double newCommission, string env)
         {
             CommissionInfo result = null;
+            var message = $"Exchange Api updateCommission (custid: {custId}, value: {newCommission})";
+
             try
             {
+                _logger.Info(message);
                 result = _apiClient.updateCommission(custId, newCommission, ExchangeEnvironment.EnvironmentMap[env]);
             }
             catch (Exception exception)
             {
-                var message = $"Exchange Api updateCommission (custid: {custId}, value: {newCommission}):\n" + LogMessageHelper.GenerateMessage(exception);
-                _logger.Error(message, exception);
+                _logger.Error($"{message}\n{LogMessageHelper.GenerateMessage(exception)}", exception);
             }
 
             return result;
