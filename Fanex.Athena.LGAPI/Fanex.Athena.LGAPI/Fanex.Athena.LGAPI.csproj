@@ -272,6 +272,9 @@
     <Content Include="SiteConfig\Web.UAT.config" />
     <Content Include="Web.AppSettings.config" />
     <Content Include="Web.ConnectionStrings.config" />
+    <Content Include="SiteConfig\Web.AppSettings.AWS.config" />
+    <Content Include="SiteConfig\Web.ConnectionStrings.AWS.config" />
+    <Content Include="SiteConfig\Web.AWS.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
