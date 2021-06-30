@@ -65,7 +65,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
                 Assert.That(result.ErrCode, Is.EqualTo(expectedErrCode));
                 Assert.That(result.DataList.Count, Is.Zero);
                 _apiClient.DidNotReceiveWithAnyArgs()
-                .queryBetHistory(metaModel.CustId, string.Empty, string.Empty, BetStatusHistory.VOIDED, false, metaModel.PageIndex, metaModel.ReportType, Enviro.POC);
+                .queryBetHistoryForAllStatus(metaModel.CustId, string.Empty, string.Empty, BetStatusHistory.VOIDED, false, metaModel.PageIndex, metaModel.ReportType, Enviro.POC);
             });
         }
 
@@ -75,7 +75,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             // Arrange
             var metaModel = CreateMetaModel();
 
-            _apiClient.isUnderMaintainence().Returns(x => throw new Exception());
+            _apiClient.isUnderMaintainence().Returns(true);
 
             var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService);
 
@@ -88,7 +88,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
                 Assert.That(result.ErrCode, Is.EqualTo(CodeForUM));
                 Assert.That(result.DataList.Count, Is.Zero);
                 _apiClient.DidNotReceiveWithAnyArgs()
-                .queryBetHistory(metaModel.CustId, string.Empty, string.Empty, BetStatusHistory.VOIDED, false, metaModel.PageIndex, metaModel.ReportType, Enviro.POC);
+                .queryBetHistoryForAllStatus(metaModel.CustId, string.Empty, string.Empty, BetStatusHistory.VOIDED, false, metaModel.PageIndex, metaModel.ReportType, Enviro.POC);
             });
         }
 
