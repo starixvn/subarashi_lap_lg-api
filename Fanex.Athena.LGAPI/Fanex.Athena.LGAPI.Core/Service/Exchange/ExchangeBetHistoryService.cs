@@ -59,9 +59,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
             GetAllDataByCustId(metaModel, totalItemsByType);
 
-            var siteId = _siteNameMap[metaModel.SiteName];
-            var key = $"ExchangeVoided_{metaModel.SelectedDateStr}_{metaModel.CustId}_{siteId}";
-            var apiData = _cacheService.Get<IEnumerable<BetHistoryResultList>>(key) ?? GetCustDataBySite(metaModel, totalItemsByType);
+            var apiData = GetCustDataBySite(metaModel, totalItemsByType);
 
             if (apiData == null)
             {
@@ -86,17 +84,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             return isValidSiteName && isValidRefno;
         }
 
-        private bool IsUM()
-        {
-            try
-            {
-                return _apiClient.isUnderMaintainence();
-            }
-            catch
-            {
-                return true;
-            }
-        }
+        private bool IsUM() =>_apiClient.isUnderMaintainence();
 
         private ReportTypeItemsDTO GetTotalItems(ExchangeGettingVoidedMetaModel metaModel, int reportType)
         {
@@ -119,9 +107,9 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         private BetHistory QueryBetHistory(ExchangeGettingVoidedMetaModel param, Enviro env)
         {
             FormatAPIParam(param);
-            var apiResult = _apiClient.queryBetHistory(param.CustId, param.StartTime, param.EndTime, BetStatusHistory.VOIDED, true, param.PageIndex, param.ReportType, env);
+            var apiResult = _apiClient.queryBetHistoryForAllStatus(param.CustId, param.StartTime, param.EndTime, BetStatusHistory.VOIDED, true, param.PageIndex, param.ReportType, env);
             Thread.Sleep(DelayTime);
-            return apiResult;
+            return apiResult.voided;
         }
 
         private static void FormatAPIParam(ExchangeGettingVoidedMetaModel param)
@@ -154,7 +142,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 while (param.PageIndex <= totalPage)
                 {
                     var apiData = _breaker.Execute(() => QueryBetHistory(param, env));
-                    var shouldBeCached = IsSuccess((int)apiData.status) && DateTime.Compare(DateTime.Now.Date, param.SelectedDate.Date) > 0;
+                    var shouldBeCached = IsSuccess((int)apiData.status) && apiData.resultList.Any() && DateTime.Compare(DateTime.Now.Date, param.SelectedDate.Date) > 0;
                     cacheKey = $"ExchangeVoided_{param.SelectedDateStr}_{param.CustId}_{param.ReportType}_{param.PageIndex}";
 
                     if (shouldBeCached)
@@ -171,8 +159,14 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         private IEnumerable<BetHistoryResultList> GetCustDataBySite(ExchangeGettingVoidedMetaModel param, List<ReportTypeItemsDTO> totalItemsByType)
         {
             var siteId = _siteNameMap[param.SiteName];
-            IEnumerable<BetHistoryResultList> dataList = new List<BetHistoryResultList>();
+            var key = $"ExchangeVoided_{param.SelectedDateStr}_{param.CustId}_{siteId}";
+            var dataList = _cacheService.Get<IEnumerable<BetHistoryResultList>>(key);
+            if (dataList != null && dataList.Any())
+            {
+                return dataList;
+            }
 
+            dataList = new List<BetHistoryResultList>();
             for (var i = 0; i < reportTypes.Length; i++)
             {
                 var t = reportTypes[i];
@@ -193,9 +187,9 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 }
             }
 
-            var key = $"ExchangeVoided_{param.SelectedDateStr}_{param.CustId}_{siteId}";
             var cachePolicy = new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(ExpirationTimeInMinute));
             _cacheService.Set<IEnumerable<BetHistoryResultList>>(key, dataList.ToList(), cachePolicy);
+
             return dataList;
         }
 
