@@ -19,12 +19,12 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         private readonly ICacheService _cacheService;
 
         private const int CodeForUM = 101;
-        private const int ExpirationTimeInMinute = 60;
+        private const int ExpirationTimeInMinute = 10;
         private const int PageSize = 2000;
         private const int SuccessCode = (int)CitiStatus.Success;
         protected const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int DelayTime = 1000;
-        private static readonly int[] reportTypes = new[] { ExchangeReportConstants.FancyBet, ExchangeReportConstants.Bookmaker };
+        private static readonly int[] reportTypes = new[] { ExchangeReportConstants.Exchange, ExchangeReportConstants.Bookmaker, ExchangeReportConstants.FancyBet };
         private static readonly IDictionary<string, string> _siteNameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
             [SiteName.OneTwoBet] = ExchangeSiteId.OneTwoBet,
@@ -142,9 +142,8 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 while (param.PageIndex <= totalPage)
                 {
                     var apiData = _breaker.Execute(() => QueryBetHistory(param, env));
-                    var shouldBeCached = IsSuccess((int)apiData.status) && apiData.resultList.Any() && DateTime.Compare(DateTime.Now.Date, param.SelectedDate.Date) > 0;
+                    var shouldBeCached = IsSuccess((int)apiData.status) && apiData.resultList.Any();
                     cacheKey = $"ExchangeVoided_{param.SelectedDateStr}_{param.CustId}_{param.ReportType}_{param.PageIndex}";
-
                     if (shouldBeCached)
                     {
                         var cachePolicy = new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(ExpirationTimeInMinute));
@@ -189,7 +188,6 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
             var cachePolicy = new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(ExpirationTimeInMinute));
             _cacheService.Set<IEnumerable<BetHistoryResultList>>(key, dataList.ToList(), cachePolicy);
-
             return dataList;
         }
 
