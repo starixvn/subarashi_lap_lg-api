@@ -1,4 +1,15 @@
-﻿using System;
+﻿using Autofac;
+using Autofac.Integration.Mvc;
+using Autofac.Integration.WebApi;
+using CitiXchangeLibrary;
+using Fanex.Athena.LGAPI.Core.Model.Configuration;
+using Fanex.Athena.LGAPI.Core.Service;
+using Fanex.Athena.LGAPI.Core.Utility;
+using Fanex.Caching;
+using Fanex.Caching.Redis;
+using Fanex.Logging;
+using Polly;
+using System;
 using System.Configuration;
 using System.Linq;
 using System.Reflection;
@@ -6,15 +17,6 @@ using System.Text;
 using System.Web.Compilation;
 using System.Web.Http;
 using System.Web.Mvc;
-using Autofac;
-using Autofac.Integration.Mvc;
-using Autofac.Integration.WebApi;
-using CitiXchangeLibrary;
-using Fanex.Athena.LGAPI.Core.Utility;
-using Fanex.Caching;
-using Fanex.Caching.Redis;
-using Fanex.Logging;
-using Polly;
 
 namespace Fanex.Athena.LGAPI
 {
@@ -33,6 +35,7 @@ namespace Fanex.Athena.LGAPI
             RegisterCachingService(builder);
             RegisterThirdpartyServices(builder);
             RegisterCircuitBreaker(builder);
+            RegisterSingleton(builder);
 
             builder.RegisterControllers(assemblies);
             builder.RegisterApiControllers(assemblies);
@@ -95,6 +98,16 @@ namespace Fanex.Athena.LGAPI
             })).As<ICache>().SingleInstance();
 
             builder.RegisterType<CacheService>().As<ICacheService>().SingleInstance();
+        }
+
+        private static void RegisterSingleton(ContainerBuilder builder)
+        {
+            builder.Register(x => new PortalService(
+                new PortalOptions(
+                    ConfigurationManager.AppSettings["Portal_Address"],
+                    ConfigurationManager.AppSettings["Portal_Proxy"],
+                    ConfigurationManager.AppSettings["Portal_AccessKey"]))
+                ).As<IPortalService>().SingleInstance();
         }
 
         private static Assembly[] GetAssemblies()
