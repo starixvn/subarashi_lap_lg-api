@@ -146,9 +146,6 @@
     <Compile Include="Controllers\ExchangeControllerTest.cs" />
     <Compile Include="HelperTest\FakeHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service\ApiMethodOperationHandlerTest.cs" />
-    <Compile Include="Service\CasinoCustomerServiceTest.cs" />
-    <Compile Include="Service\CasinoSettingServiceTest.cs" />
     <Compile Include="Service\Exchange\ExchangeBetHistoryServiceTests.cs" />
     <Compile Include="Service\Exchange\ExchangeClientWrapperTest.cs" />
   </ItemGroup>
