@@ -141,12 +141,6 @@
     <Compile Include="Model\MetalModel\Portal\GetLeagueGroupsMetaModel.cs" />
     <Compile Include="Model\MetalModel\Portal\GetSpecialLeaguesMetaModel.cs" />
     <Compile Include="Model\MetalModel\Portal\GetLimitLeaguesMetaModel.cs" />
-    <Compile Include="Model\MetalModel\RNGCasino\RngCasinoUpdateSettingMetaModel.cs" />
-    <Compile Include="Model\DTO\RNGCasino\GameKind.cs" />
-    <Compile Include="Model\DTO\RNGCasino\GameType.cs" />
-    <Compile Include="Model\DTO\RNGCasino\StakeLevel.cs" />
-    <Compile Include="Model\MetalModel\RNGCasino\GetGameTypeMetalModel.cs" />
-    <Compile Include="Model\MetalModel\RNGCasino\RngCasinoSettingMetaModel.cs" />
     <Compile Include="Model\MetalModel\SSAS\QueryMultipleMetaModel.cs" />
     <Compile Include="Model\MetalModel\SSAS\BaseSSASMetaModel.cs" />
     <Compile Include="Model\MetalModel\SSAS\QueryMetaModel.cs" />
@@ -157,9 +151,6 @@
     <Compile Include="Service\Exchange\IExchangeBetHistoryService.cs" />
     <Compile Include="Service\Portal\IPortalService.cs" />
     <Compile Include="Service\Portal\PortalService.cs" />
-    <Compile Include="Model\MetalModel\RNGCasino\BetSettingCasinoStatusMetaModel.cs" />
-    <Compile Include="Model\MetalModel\RNGCasino\CustomerStatusMetaModel.cs" />
-    <Compile Include="Model\MetalModel\RNGCasino\RNGCasinoUpdateMemberComMetaModel.cs" />
     <Compile Include="Utility\DateTimeHelper.cs" />
     <Compile Include="Utility\LogMessageHelper.cs" />
   </ItemGroup>
