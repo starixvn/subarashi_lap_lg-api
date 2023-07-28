@@ -18,12 +18,12 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             _logger = logger;
         }
 
-        public GetProfile GetCommission(int custId, string env)
+        public GetProfile GetCommission(int custId, string env, int groupMode)
         {
             GetProfile result = null;
             try
             {
-                result = _apiClient.getProfile(custId, ExchangeEnvironment.EnvironmentMap[env]);
+                result = _apiClient.getProfile(custId, ExchangeEnvironment.EnvironmentMap[env], groupMode);
             }
             catch (Exception exception)
             {
@@ -34,7 +34,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             return result;
         }
 
-        public CommissionInfo UpdateCommission(int custId, double newCommission, string env)
+        public CommissionInfo UpdateCommission(int custId, double newCommission, string env, int groupMode)
         {
             CommissionInfo result = null;
             var message = $"Exchange Api updateCommission (custid: {custId}, value: {newCommission})";
@@ -42,7 +42,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             try
             {
                 _logger.Info(message);
-                result = _apiClient.updateCommission(custId, newCommission, ExchangeEnvironment.EnvironmentMap[env]);
+                result = _apiClient.updateCommission(custId, newCommission, ExchangeEnvironment.EnvironmentMap[env], groupMode);
             }
             catch (Exception exception)
             {

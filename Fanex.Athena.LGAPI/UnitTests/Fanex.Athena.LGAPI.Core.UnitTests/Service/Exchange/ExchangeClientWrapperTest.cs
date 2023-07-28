@@ -36,12 +36,12 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         {
             // Arrange
             var expectedResult = new GetProfile();
-            _apiClient.getProfile(CustId, Enviro.POC).Returns(expectedResult);
+            _apiClient.getProfile(CustId, Enviro.POC, 0).Returns(expectedResult);
 
             var wrapper = new ExchangeClientWrapper(_apiClient, _logger);
 
             // Action
-            var result = wrapper.GetCommission(CustId, Environment);
+            var result = wrapper.GetCommission(CustId, Environment, 0);
 
             // Assert
             Assert.That(result, Is.EqualTo(expectedResult));
@@ -53,12 +53,12 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             // Arrange
             const string ErrMsg = "GetCommission - ThrowException";
             var expectedResult = new GetProfile();
-            _apiClient.getProfile(CustId, Enviro.POC).Returns(x => throw new Exception(ErrMsg));
+            _apiClient.getProfile(CustId, Enviro.POC, 0).Returns(x => throw new Exception(ErrMsg));
 
             var wrapper = new ExchangeClientWrapper(_apiClient, _logger);
 
             // Action
-            var result = wrapper.GetCommission(CustId, Environment);
+            var result = wrapper.GetCommission(CustId, Environment, 0);
 
             // Assert
             Assert.That(result, Is.Null);
@@ -71,12 +71,12 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             // Arrange
             const double NewCommisison = 0.5;
             var expectedResult = new CommissionInfo();
-            _apiClient.updateCommission(CustId, NewCommisison, Enviro.POC).Returns(expectedResult);
+            _apiClient.updateCommission(CustId, NewCommisison, Enviro.POC, 0).Returns(expectedResult);
 
             var wrapper = new ExchangeClientWrapper(_apiClient, _logger);
 
             // Action
-            var result = wrapper.UpdateCommission(CustId, NewCommisison, Environment);
+            var result = wrapper.UpdateCommission(CustId, NewCommisison, Environment, 0);
 
             // Assert
             Assert.That(result, Is.EqualTo(expectedResult));
@@ -89,13 +89,13 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             const string ErrMsg = "UpdateCommission - ThrowException";
             const double NewCommisison = 0.5;
             var expectedResult = new CommissionInfo();
-            _apiClient.updateCommission(CustId, NewCommisison, Enviro.POC)
+            _apiClient.updateCommission(CustId, NewCommisison, Enviro.POC, 0)
                 .Returns(x => throw new Exception(ErrMsg));
 
             var wrapper = new ExchangeClientWrapper(_apiClient, _logger);
 
             // Action
-            var result = wrapper.UpdateCommission(CustId, NewCommisison, Environment);
+            var result = wrapper.UpdateCommission(CustId, NewCommisison, Environment, 0);
 
             // Assert
             Assert.That(result, Is.Null);

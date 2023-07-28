@@ -19,7 +19,7 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
         [HttpPost]
         public ActionResult GetCommission(ExchangeBaseMetaModel metaModel)
         {
-            var result = _exchangeClient.GetCommission(metaModel.CustId, metaModel.Environment);
+            var result = _exchangeClient.GetCommission(metaModel.CustId, metaModel.Environment, 0);
 
             return Json(new { Data = result });
         }
@@ -27,7 +27,7 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
         [HttpPost]
         public ActionResult UpdateCommission(ExchangeUpdatingCommissionMetaModel metaModel)
         {
-            var result = _exchangeClient.UpdateCommission(metaModel.CustId, metaModel.Commission, metaModel.Environment);
+            var result = _exchangeClient.UpdateCommission(metaModel.CustId, metaModel.Commission, metaModel.Environment, metaModel.GroupMode);
 
             return Json(new { Data = result });
         }

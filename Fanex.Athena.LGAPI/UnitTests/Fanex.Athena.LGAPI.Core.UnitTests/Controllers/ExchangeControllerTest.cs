@@ -36,7 +36,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Controllers
             var metaModel = _fixture.Create<ExchangeBaseMetaModel>();
             var expectedProfile = _fixture.Create<GetProfile>();
 
-            _exchangeWrapper.GetCommission(metaModel.CustId, metaModel.Environment).Returns(expectedProfile);
+            _exchangeWrapper.GetCommission(metaModel.CustId, metaModel.Environment, 0).Returns(expectedProfile);
             var expectedResult = JsonConvert.SerializeObject(new { Data = expectedProfile });
 
             using (var controller = new ExchangeController(_exchangeWrapper))
@@ -57,7 +57,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Controllers
             var metaModel = _fixture.Create<ExchangeUpdatingCommissionMetaModel>();
             var commissionInfo = _fixture.Create<CommissionInfo>();
 
-            _exchangeWrapper.UpdateCommission(metaModel.CustId, metaModel.Commission, metaModel.Environment)
+            _exchangeWrapper.UpdateCommission(metaModel.CustId, metaModel.Commission, metaModel.Environment, 0)
                 .Returns(commissionInfo);
             var expectedResult = JsonConvert.SerializeObject(new { Data = commissionInfo });
 
