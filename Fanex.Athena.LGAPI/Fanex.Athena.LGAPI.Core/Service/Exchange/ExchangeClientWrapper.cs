@@ -23,6 +23,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             GetProfile result = null;
             try
             {
+                _logger.Info($"{custId} - {env} - {groupMode}");
                 result = _apiClient.getProfile(custId, ExchangeEnvironment.EnvironmentMap[env], groupMode);
             }
             catch (Exception exception)
