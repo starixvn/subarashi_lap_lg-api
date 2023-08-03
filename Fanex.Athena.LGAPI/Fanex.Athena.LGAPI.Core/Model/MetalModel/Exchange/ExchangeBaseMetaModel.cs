@@ -5,5 +5,7 @@
         public int CustId { get; set; }
 
         public string Environment { get; set; }
+
+        public int GroupMode { get; set; }
     }
 }
