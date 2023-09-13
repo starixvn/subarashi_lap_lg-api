@@ -3,7 +3,5 @@
     public class ExchangeUpdatingCommissionMetaModel : ExchangeBaseMetaModel
     {
         public double Commission { get; set; }
-
-        public int GroupMode { get; set; }
     }
 }
