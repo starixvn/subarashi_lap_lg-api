@@ -1,11 +1,13 @@
-﻿using CitiXchangeLibrary;
+﻿
+using Fanex.ThirdParty.ExchangeProduct.Model;
+using System.Threading.Tasks;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 {
     public interface IExchangeClientWrapper
     {
-        GetProfile GetCommission(int custId, string env);
+        Task<GetProfile> GetCommission(int custId, int groupMode);
 
-        CommissionInfo UpdateCommission(int custId, double newCommission, string env);
+        Task<CommissionInfo> UpdateCommission(int custId, double newCommission, int groupMode);
     }
 }

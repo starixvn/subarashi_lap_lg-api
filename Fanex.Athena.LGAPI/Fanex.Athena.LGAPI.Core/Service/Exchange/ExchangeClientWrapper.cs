@@ -1,29 +1,36 @@
 ﻿using System;
-using CitiXchangeLibrary;
-using Fanex.Athena.LGAPI.Core.Constants;
+using System.Threading.Tasks;
 using Fanex.Athena.LGAPI.Core.Utility;
 using Fanex.Logging;
+using Fanex.ThirdParty.ExchangeProduct.HttpClients;
+using Fanex.ThirdParty.ExchangeProduct.Model;
+using Fanex.ThirdParty.ExchangeProduct.Params;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 {
     public class ExchangeClientWrapper : IExchangeClientWrapper
     {
-        private readonly ICitiXchangeClient _apiClient;
+        private readonly IExchangeHttpClient _apiClient;
 
         private readonly ILogger _logger;
 
-        public ExchangeClientWrapper(ICitiXchangeClient apiClient, ILogger logger)
+        public ExchangeClientWrapper(IExchangeHttpClient apiClient, ILogger logger)
         {
             _apiClient = apiClient;
             _logger = logger;
         }
 
-        public GetProfile GetCommission(int custId, string env)
+        public async Task<GetProfile> GetCommission(int custId, int groupMode)
         {
             GetProfile result = null;
             try
             {
-                result = _apiClient.getProfile(custId, ExchangeEnvironment.EnvironmentMap[env]);
+                var response = await _apiClient.GetProfileAsync(new GetProfileParam
+                {
+                    CustId = custId,
+                    GroupMode = groupMode
+                });
+                result = response.Result;
             }
             catch (Exception exception)
             {
@@ -34,15 +41,20 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             return result;
         }
 
-        public CommissionInfo UpdateCommission(int custId, double newCommission, string env)
+        public async Task<CommissionInfo> UpdateCommission(int custId, double newCommission, int groupMode)
         {
             CommissionInfo result = null;
             var message = $"Exchange Api updateCommission (custid: {custId}, value: {newCommission})";
 
             try
             {
-                _logger.Info(message);
-                result = _apiClient.updateCommission(custId, newCommission, ExchangeEnvironment.EnvironmentMap[env]);
+                var response = await _apiClient.UpdateCommissionAsync(new UpdateCommissionParam
+                {
+                    CustId = custId,
+                    Commission = newCommission,
+                    GroupMode= groupMode
+                });
+                result = response.Result;
             }
             catch (Exception exception)
             {

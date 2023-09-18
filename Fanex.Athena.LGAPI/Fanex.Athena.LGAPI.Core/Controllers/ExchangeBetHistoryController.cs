@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Threading.Tasks;
+using System.Web.Mvc;
 using Fanex.Athena.LGAPI.Core.Attributes;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
 using Fanex.Athena.LGAPI.Core.Service.Exchange;
@@ -17,9 +18,9 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
         }
 
         [HttpPost]
-        public ActionResult Index(ExchangeGettingVoidedMetaModel metaModel)
+        public async Task<ActionResult> Index(ExchangeGettingVoidedMetaModel metaModel)
         {
-            return Json(_exchangeService.GetVoidedData(metaModel));
+            return Json(await _exchangeService.GetVoidedData(metaModel));
         }
     }
 }
