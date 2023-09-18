@@ -1,8 +1,13 @@
 ﻿using System;
-using CitiXchangeLibrary;
+using System.Threading.Tasks;
 using Fanex.Athena.LGAPI.Core.Service.Exchange;
 using Fanex.Logging;
+using Fanex.ThirdParty.ExchangeProduct;
+using Fanex.ThirdParty.ExchangeProduct.HttpClients;
+using Fanex.ThirdParty.ExchangeProduct.Model;
+using Fanex.ThirdParty.ExchangeProduct.Params;
 using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using NUnit.Framework;
 
 namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
@@ -10,17 +15,15 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
     [TestFixture]
     public class ExchangeClientWrapperTest
     {
-        private ICitiXchangeClient _apiClient;
+        private IExchangeHttpClient _apiClient;
 
         private ILogger _logger;
-
-        private const string Environment = "DEV";
         private const int CustId = 1;
 
         [SetUp]
         public void SetUp()
         {
-            _apiClient = Substitute.For<ICitiXchangeClient>();
+            _apiClient = Substitute.For<IExchangeHttpClient>();
             _logger = Substitute.For<ILogger>();
         }
 
@@ -32,33 +35,32 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         }
 
         [Test]
-        public void GetCommission_WhenCall_ReturnCorrectResult()
+        public async Task GetCommission_WhenCall_ReturnCorrectResult()
         {
             // Arrange
-            var expectedResult = new GetProfile();
-            _apiClient.getProfile(CustId, Enviro.POC, 0).Returns(expectedResult);
+            var expectedResult = new ResponseResult<GetProfile> { Result = new GetProfile() };
+            _apiClient.GetProfileAsync(default).ReturnsForAnyArgs(expectedResult);
 
             var wrapper = new ExchangeClientWrapper(_apiClient, _logger);
 
             // Action
-            var result = wrapper.GetCommission(CustId, Environment, 0);
+            var result = await wrapper.GetCommission(CustId, 0);
 
             // Assert
             Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test]
-        public void GetCommission_ThrowException_LogCorrectInfo()
+        public async Task GetCommission_ThrowException_LogCorrectInfo()
         {
             // Arrange
             const string ErrMsg = "GetCommission - ThrowException";
-            var expectedResult = new GetProfile();
-            _apiClient.getProfile(CustId, Enviro.POC, 0).Returns(x => throw new Exception(ErrMsg));
+            _apiClient.GetProfileAsync(default).ThrowsForAnyArgs(x => throw new Exception(ErrMsg));
 
             var wrapper = new ExchangeClientWrapper(_apiClient, _logger);
 
             // Action
-            var result = wrapper.GetCommission(CustId, Environment, 0);
+            var result = await wrapper.GetCommission(CustId, 0);
 
             // Assert
             Assert.That(result, Is.Null);
@@ -66,36 +68,35 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         }
 
         [Test]
-        public void UpdateCommission_WhenCall_ReturnCorrectResult()
+        public async Task UpdateCommission_WhenCall_ReturnCorrectResult()
         {
             // Arrange
             const double NewCommisison = 0.5;
             var expectedResult = new CommissionInfo();
-            _apiClient.updateCommission(CustId, NewCommisison, Enviro.POC, 0).Returns(expectedResult);
+             _apiClient.UpdateCommissionAsync(default).ReturnsForAnyArgs(Task.FromResult(new ResponseResult<CommissionInfo> { Result = expectedResult }));
 
             var wrapper = new ExchangeClientWrapper(_apiClient, _logger);
 
             // Action
-            var result = wrapper.UpdateCommission(CustId, NewCommisison, Environment, 0);
+            var result = await wrapper.UpdateCommission(CustId, NewCommisison, 0);
 
             // Assert
             Assert.That(result, Is.EqualTo(expectedResult));
         }
 
         [Test]
-        public void UpdateCommission_ThrowException_LogCorrectInfo()
+        public async Task UpdateCommission_ThrowException_LogCorrectInfo()
         {
             // Arrange
             const string ErrMsg = "UpdateCommission - ThrowException";
             const double NewCommisison = 0.5;
-            var expectedResult = new CommissionInfo();
-            _apiClient.updateCommission(CustId, NewCommisison, Enviro.POC, 0)
-                .Returns(x => throw new Exception(ErrMsg));
+            _apiClient.UpdateCommissionAsync(default)
+                .ThrowsForAnyArgs(x => throw new Exception(ErrMsg));
 
             var wrapper = new ExchangeClientWrapper(_apiClient, _logger);
 
             // Action
-            var result = wrapper.UpdateCommission(CustId, NewCommisison, Environment, 0);
+            var result = await wrapper.UpdateCommission(CustId, NewCommisison, 0);
 
             // Assert
             Assert.That(result, Is.Null);

@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using AutoFixture;
-using CitiXchangeLibrary;
 using Fanex.Athena.LGAPI.Core.Model.DataDomain;
+using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
 using Fanex.Athena.LGAPI.Core.Service.Exchange;
 using Fanex.Caching;
+using Fanex.ThirdParty.ExchangeProduct.Enums;
+using Fanex.ThirdParty.ExchangeProduct.HttpClients;
+using Fanex.ThirdParty.ExchangeProduct.Model;
 using NSubstitute;
 using NUnit.Framework;
 using Polly;
@@ -17,9 +22,10 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
     {
         private static Fixture _fixture = new Fixture();
 
-        private ICitiXchangeClient _apiClient;
-        private ISyncPolicy<BetHistory> _breaker;
+        private IExchangeHttpClient _apiClient;
+        private IAsyncPolicy<BetHistory> _breaker;
         private ICacheService _cacheService;
+        private IExchangeSetting _exchangeSetting;
 
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int CodeForUM = 101;
@@ -30,9 +36,10 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         [SetUp]
         public void SetUp()
         {
-            _apiClient = Substitute.For<ICitiXchangeClient>();
-            _breaker = Policy.NoOp<BetHistory>();
+            _apiClient = Substitute.For<IExchangeHttpClient>();
+            _breaker = Policy.NoOpAsync<BetHistory>();
             _cacheService = Substitute.For<ICacheService>();
+            _exchangeSetting = Substitute.For<IExchangeSetting>();
         }
 
         [TearDown]
@@ -43,21 +50,22 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             _cacheService = null;
         }
 
-        [TestCase(SiteName.OneTwoBet, true, "", CodeForUM)]
         [TestCase("WrongSitename", false, "", (int)CitiStatus.Success)]
-        [TestCase(SiteName.OneTwoBet, false, "abc", (int)CitiStatus.Success)]
-        [TestCase(SiteName.OneTwoBet, false, "5000000000", (int)CitiStatus.Success)]
-        public void GetVoidedData_InvalidParamOrInUMTime_ReturnCorrectResult(string siteName, bool isUM, string refNo, int expectedErrCode)
+        public async Task GetVoidedData_InvalidParam_ReturnCorrectResult(string siteName, bool isValidSiteName, string refNo, int expectedErrCode)
         {
             // Arrange
             var metaModel = CreateMetaModel(siteName: siteName, refNo: refNo);
+            var listSiteName = new List<ExchangeLicenseeMapping>();
+            if (isValidSiteName)
+            {
+                listSiteName.Add(new ExchangeLicenseeMapping { ExchangeId = 1, Name = siteName });
+            }
+            _exchangeSetting.ExchangeLicenseeMappings.Returns(listSiteName);
 
-            _apiClient.isUnderMaintainence().Returns(isUM);
-
-            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService);
+            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService, _exchangeSetting);
 
             // Action
-            var result = service.GetVoidedData(metaModel);
+            var result = await service.GetVoidedData(metaModel);
 
             // Assert
             Assert.Multiple(() =>
@@ -65,30 +73,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
                 Assert.That(result.ErrCode, Is.EqualTo(expectedErrCode));
                 Assert.That(result.DataList.Count, Is.Zero);
                 _apiClient.DidNotReceiveWithAnyArgs()
-                .queryBetHistoryForAllStatus(metaModel.CustId, string.Empty, string.Empty, BetStatusHistory.VOIDED, false, metaModel.PageIndex, metaModel.ReportType, Enviro.POC);
-            });
-        }
-
-        [Test]
-        public void GetVoidedData_CheckUMButThrowException_UMIsTrueAndReturnCorrectResult()
-        {
-            // Arrange
-            var metaModel = CreateMetaModel();
-
-            _apiClient.isUnderMaintainence().Returns(true);
-
-            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService);
-
-            // Action
-            var result = service.GetVoidedData(metaModel);
-
-            // Assert
-            Assert.Multiple(() =>
-            {
-                Assert.That(result.ErrCode, Is.EqualTo(CodeForUM));
-                Assert.That(result.DataList.Count, Is.Zero);
-                _apiClient.DidNotReceiveWithAnyArgs()
-                .queryBetHistoryForAllStatus(metaModel.CustId, string.Empty, string.Empty, BetStatusHistory.VOIDED, false, metaModel.PageIndex, metaModel.ReportType, Enviro.POC);
+                .QueryBetHistoryForAllStatusAsync(default);
             });
         }
 

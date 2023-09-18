@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Threading.Tasks;
+using System.Web.Mvc;
 using AutoFixture;
 using Fanex.Athena.LGAPI.Core.Controllers;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
@@ -29,7 +30,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Controllers
         }
 
         [Test]
-        public void Index_WhenCall_ReturnCorrectResult()
+        public async Task Index_WhenCall_ReturnCorrectResult()
         {
             // Arrange
             var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
@@ -40,7 +41,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Controllers
             using (var controller = new ExchangeBetHistoryController(_exchangeService))
             {
                 // Action
-                var jsonResult = controller.Index(metaModel) as JsonResult;
+                var jsonResult = await controller.Index(metaModel) as JsonResult;
                 var result = jsonResult.Data;
 
                 // Assert
