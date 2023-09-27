@@ -39,6 +39,7 @@ namespace Fanex.Athena.LGAPI.Core.Utility
             builder.AppendLine();
             builder.AppendLine("EXCEPTION INFO");
 
+            builder.AppendLine($"ErrMsg: {exception.Message}");
             builder.AppendLine($"Source: {exception.Source}");
             builder.AppendLine($"TargetSite: {exception.TargetSite}");
             builder.AppendLine($"StackTrace: {exception.StackTrace}");
