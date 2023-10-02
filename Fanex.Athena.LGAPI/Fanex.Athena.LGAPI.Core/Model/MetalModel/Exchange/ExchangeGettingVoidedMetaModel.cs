@@ -6,6 +6,8 @@ namespace Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange
     {
         public DateTime SelectedDate { get; set; }
 
+        public int TimeZone { get; set; }
+
         public int PageIndex { get; set; }
 
         public string RefNo { get; set; }
@@ -14,7 +16,7 @@ namespace Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange
 
         public int ReportType { get; set; }
 
-        public string SelectedDateStr => SelectedDate.ToString("yyyyMMdd");
+        public string SelectedDateStr => string.Format("{0}_GMT{1}", SelectedDate.ToString("yyyyMMdd"), TimeZone);
         public string StartTime { get; set; }
         public string EndTime { get; set; }
 
@@ -27,7 +29,8 @@ namespace Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange
                 SiteName = SiteName,
                 ReportType = ReportType,
                 CustId = CustId,
-                Environment = Environment
+                Environment = Environment,
+                TimeZone = TimeZone,
             };
     }
 }

@@ -68,8 +68,8 @@
     <Reference Include="Fanex.Logging.Sentry.RavenClient, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Fanex.Logging.Sentry.RavenClient.1.0.1\lib\net461\Fanex.Logging.Sentry.RavenClient.dll</HintPath>
     </Reference>
-    <Reference Include="Fanex.ThirdParty.ExchangeProduct, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fanex.LAP.ThirdParty.ExchangeProduct.1.0.6\lib\net461\Fanex.ThirdParty.ExchangeProduct.dll</HintPath>
+    <Reference Include="Fanex.ThirdParty.ExchangeProduct, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fanex.LAP.ThirdParty.ExchangeProduct.1.0.7\lib\net461\Fanex.ThirdParty.ExchangeProduct.dll</HintPath>
     </Reference>
     <Reference Include="MessagePack, Version=1.7.3.4, Culture=neutral, PublicKeyToken=b4a0369545f0a1be, processorArchitecture=MSIL">
       <HintPath>..\packages\MessagePack.1.7.3.4\lib\net45\MessagePack.dll</HintPath>

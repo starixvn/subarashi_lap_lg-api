@@ -32,5 +32,13 @@ namespace Fanex.Athena.LGAPI.Core.Controllers
 
             return Json(new { Data = result });
         }
+
+        [HttpPost]
+        public async Task<ActionResult> IsUnderMaintenance()
+        {
+            var result = await _exchangeClient.IsUnderMaintenance();
+
+            return Json(result);
+        }
     }
 }

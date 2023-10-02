@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -8,6 +7,7 @@ using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
 using Fanex.Athena.LGAPI.Core.Service.Exchange;
 using Fanex.Caching;
+using Fanex.Logging;
 using Fanex.ThirdParty.ExchangeProduct.Enums;
 using Fanex.ThirdParty.ExchangeProduct.HttpClients;
 using Fanex.ThirdParty.ExchangeProduct.Model;
@@ -26,6 +26,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         private IAsyncPolicy<BetHistory> _breaker;
         private ICacheService _cacheService;
         private IExchangeSetting _exchangeSetting;
+        private ILogger _logger;
 
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int CodeForUM = 101;
@@ -40,6 +41,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             _breaker = Policy.NoOpAsync<BetHistory>();
             _cacheService = Substitute.For<ICacheService>();
             _exchangeSetting = Substitute.For<IExchangeSetting>();
+            _logger = Substitute.For<ILogger>();
         }
 
         [TearDown]
@@ -62,7 +64,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             }
             _exchangeSetting.ExchangeLicenseeMappings.Returns(listSiteName);
 
-            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService, _exchangeSetting);
+            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService, _exchangeSetting, _logger);
 
             // Action
             var result = await service.GetVoidedData(metaModel);

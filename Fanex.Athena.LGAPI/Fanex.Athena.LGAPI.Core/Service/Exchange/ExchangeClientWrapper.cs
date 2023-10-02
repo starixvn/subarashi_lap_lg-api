@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Fanex.Athena.LGAPI.Core.Utility;
+using Fanex.Caching;
 using Fanex.Logging;
 using Fanex.ThirdParty.ExchangeProduct.HttpClients;
 using Fanex.ThirdParty.ExchangeProduct.Model;
@@ -8,16 +9,10 @@ using Fanex.ThirdParty.ExchangeProduct.Params;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 {
-    public class ExchangeClientWrapper : IExchangeClientWrapper
+    public class ExchangeClientWrapper : ExchangeCommonService, IExchangeClientWrapper
     {
-        private readonly IExchangeHttpClient _apiClient;
-
-        private readonly ILogger _logger;
-
-        public ExchangeClientWrapper(IExchangeHttpClient apiClient, ILogger logger)
+        public ExchangeClientWrapper(IExchangeHttpClient apiClient, ILogger logger, ICacheService cacheService) : base(apiClient, logger, cacheService)
         {
-            _apiClient = apiClient;
-            _logger = logger;
         }
 
         public async Task<GetProfile> GetCommission(int custId, int groupMode)
@@ -52,7 +47,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 {
                     CustId = custId,
                     Commission = newCommission,
-                    GroupMode= groupMode
+                    GroupMode = groupMode
                 });
                 result = response.Result;
             }
