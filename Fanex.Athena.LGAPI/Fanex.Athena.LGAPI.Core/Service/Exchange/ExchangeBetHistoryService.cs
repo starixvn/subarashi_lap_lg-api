@@ -12,37 +12,42 @@ using Fanex.ThirdParty.ExchangeProduct.Enums;
 using Fanex.ThirdParty.ExchangeProduct.HttpClients;
 using Fanex.ThirdParty.ExchangeProduct.Model;
 using Fanex.ThirdParty.ExchangeProduct.Params;
-using Newtonsoft.Json;
 using Polly;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 {
-    public class ExchangeBetHistoryService : IExchangeBetHistoryService
+    public class ExchangeBetHistoryService : ExchangeCommonService, IExchangeBetHistoryService
     {
-        private readonly IExchangeHttpClient _apiClient;
         private readonly IAsyncPolicy<BetHistory> _breaker;
-        private readonly ICacheService _cacheService;
         private readonly IExchangeSetting _setting;
 
+        private const int DefaultTimeZone = 8;
         private const int ExpirationTimeInMinute = 10;
         private const int PageSize = 2000;
         private const int SuccessCode = (int)CitiStatus.Success;
+        private const int UMCode = (int)CitiStatus.Under_Maintainence;
         protected const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int DelayTime = 1000;
         private static readonly int[] reportTypes = new[] { ExchangeReportConstants.Exchange, ExchangeReportConstants.Bookmaker, ExchangeReportConstants.FancyBet };
 
         private IEnumerable<ExchangeLicenseeMapping> SiteNameMapping => _setting.ExchangeLicenseeMappings;
 
-        public ExchangeBetHistoryService(IExchangeHttpClient apiClient, IAsyncPolicy<BetHistory> breaker, ICacheService cacheService, IExchangeSetting setting)
+        public ExchangeBetHistoryService(IExchangeHttpClient apiClient, IAsyncPolicy<BetHistory> breaker, ICacheService cacheService, IExchangeSetting setting, ILogger logger)
+            : base(apiClient, logger, cacheService)
         {
-            _apiClient = apiClient;
             _breaker = breaker;
-            _cacheService = cacheService;
             _setting = setting;
         }
 
         public async Task<BetHistoryResult> GetVoidedData(ExchangeGettingVoidedMetaModel metaModel)
         {
+            var isUM = await IsUnderMaintenance();
+
+            if (isUM)
+            {
+                return new BetHistoryResult(UMCode);
+            }
+
             if (!IsValidParam(metaModel))
             {
                 return new BetHistoryResult(SuccessCode);
@@ -89,7 +94,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             param.PageIndex = 1;
 
             var result = new ReportTypeItemsDTO { ReportType = reportType };
-            var apiData = await _breaker.ExecuteAsync(async () =>await  QueryBetHistory(param));
+            var apiData = await _breaker.ExecuteAsync(async () => await QueryBetHistory(param));
             if (apiData != null)
             {
                 result.Status = (int)apiData.status;
@@ -113,6 +118,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 PageNumber = param.PageIndex,
                 ReportType = param.ReportType,
             };
+
             var apiResult = await _apiClient.QueryBetHistoryForAllStatusAsync(queryParam);
             await Task.Delay(DelayTime);
             return apiResult.Result.voided;
@@ -120,7 +126,9 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         private static void FormatAPIParam(ExchangeGettingVoidedMetaModel param)
         {
-            var selectedDate = param.SelectedDate.Date;
+            var diffHours = DefaultTimeZone - param.TimeZone;
+            var selectedDate = param.SelectedDate.Date.AddHours(diffHours);
+
             param.StartTime = selectedDate.ToString(DateTimeFormat);
             param.EndTime = selectedDate.AddDays(1).ToString(DateTimeFormat);
             param.GroupMode = string.Equals(SiteName.OneTwoBet, param.SiteName, StringComparison.OrdinalIgnoreCase) ? (int)GroupMode.OneTwoBet : (int)GroupMode.Other;
