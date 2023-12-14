@@ -240,6 +240,7 @@
     <Content Include="App_Data\ExchangeLicenseeMapping.LOCAL.json" />
     <Content Include="App_Data\ExchangeLicenseeMapping.UAT.json" />
     <Content Include="App_Data\ExchangeLicenseeMapping.AWS.json" />
+    <Content Include="App_Data\ExchangeLicenseeMapping.KLDR.json" />
     <None Include="packages.config" />
     <Content Include="SiteConfig\Web.AppSettings.BACKUPMNL.config" />
     <Content Include="SiteConfig\Web.AppSettings.LOCAL.config" />
@@ -263,6 +264,9 @@
     <Content Include="SiteConfig\Web.AppSettings.AWS.config" />
     <Content Include="SiteConfig\Web.ConnectionStrings.AWS.config" />
     <Content Include="SiteConfig\Web.AWS.config" />
+    <Content Include="SiteConfig\Web.AppSettings.KLDR.config" />
+    <Content Include="SiteConfig\Web.ConnectionStrings.KLDR.config" />
+    <Content Include="SiteConfig\Web.KLDR.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
