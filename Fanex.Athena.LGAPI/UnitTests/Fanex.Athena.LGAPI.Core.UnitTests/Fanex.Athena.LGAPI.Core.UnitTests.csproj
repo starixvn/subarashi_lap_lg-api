@@ -50,8 +50,8 @@
     <Reference Include="Fanex.Logging, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Fanex.Logging.2.0.1\lib\net461\Fanex.Logging.dll</HintPath>
     </Reference>
-    <Reference Include="Fanex.ThirdParty.ExchangeProduct, Version=1.0.7.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Fanex.LAP.ThirdParty.ExchangeProduct.1.0.7\lib\net461\Fanex.ThirdParty.ExchangeProduct.dll</HintPath>
+    <Reference Include="Fanex.ThirdParty.ExchangeProduct, Version=1.0.8.2, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Fanex.LAP.ThirdParty.ExchangeProduct.1.0.8.2\lib\net461\Fanex.ThirdParty.ExchangeProduct.dll</HintPath>
     </Reference>
     <Reference Include="Fare, Version=2.1.0.0, Culture=neutral, PublicKeyToken=ea68d375bf33a7c8, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Fare.2.1.1\lib\net35\Fare.dll</HintPath>
