@@ -28,7 +28,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         private const int UMCode = (int)CitiStatus.Under_Maintainence;
         protected const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int DelayTime = 1000;
-        private static readonly int[] reportTypes = new[] { ExchangeReportConstants.Exchange, ExchangeReportConstants.Bookmaker, ExchangeReportConstants.FancyBet };
+        private static readonly int[] reportTypes = new[] { ExchangeReportConstants.Exchange, ExchangeReportConstants.Sportsbook, ExchangeReportConstants.Bookmaker, ExchangeReportConstants.FancyBet };
 
         private IEnumerable<ExchangeLicenseeMapping> SiteNameMapping => _setting.ExchangeLicenseeMappings;
 
@@ -83,7 +83,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         private bool IsValidParam(ExchangeGettingVoidedMetaModel metaModel)
         {
             var isValidSiteName = SiteNameMapping.Any(_ => _.Name.Equals(metaModel.SiteName, StringComparison.InvariantCultureIgnoreCase));
-            var isValidRefno = string.IsNullOrEmpty(metaModel.RefNo) || int.TryParse(metaModel.RefNo, out _);
+            var isValidRefno = string.IsNullOrEmpty(metaModel.RefNo) || long.TryParse(metaModel.RefNo, out _);
             return isValidSiteName && isValidRefno;
         }
 
