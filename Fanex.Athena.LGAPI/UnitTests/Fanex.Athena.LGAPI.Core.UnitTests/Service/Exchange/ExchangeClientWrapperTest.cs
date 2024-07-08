@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AutoFixture;
+using Fanex.Athena.LGAPI.Core.Infrastructure;
 using Fanex.Athena.LGAPI.Core.Service.Exchange;
 using Fanex.Caching;
 using Fanex.Logging;
@@ -24,6 +25,8 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         private ILogger _logger;
 
         private ICacheService _cacheService;
+        private IDbFactory _dbFactory;
+
         private const int CustId = 1;
 
         [SetUp]
@@ -32,6 +35,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             _apiClient = Substitute.For<IExchangeHttpClient>();
             _logger = Substitute.For<ILogger>();
             _cacheService = Substitute.For<ICacheService>();
+            _dbFactory = Substitute.For<IDbFactory>();
         }
 
         [TearDown]
@@ -50,7 +54,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
 
             _apiClient.GetProfileAsync(Arg.Any<GetProfileParam>()).ReturnsForAnyArgs(new ResponseResult<GetProfile> { Result = expectedResult });
 
-            var wrapper = new ExchangeClientWrapper(_apiClient, _logger, _cacheService);
+            var wrapper = CreateExchangeClientWrapper();
 
             // Action
             var result = await wrapper.GetCommission(CustId, 0);
@@ -66,7 +70,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             const string ErrMsg = "GetCommission - ThrowException";
             _apiClient.GetProfileAsync(default).ThrowsForAnyArgs(x => throw new Exception(ErrMsg));
 
-            var wrapper = new ExchangeClientWrapper(_apiClient, _logger, _cacheService);
+            var wrapper = CreateExchangeClientWrapper();
 
             // Action
             var result = await wrapper.GetCommission(CustId, 0);
@@ -84,7 +88,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             var expectedResult = new CommissionInfo();
             _apiClient.UpdateCommissionAsync(default).ReturnsForAnyArgs(Task.FromResult(new ResponseResult<CommissionInfo> { Result = expectedResult }));
 
-            var wrapper = new ExchangeClientWrapper(_apiClient, _logger, _cacheService);
+            var wrapper = CreateExchangeClientWrapper();
 
             // Action
             var result = await wrapper.UpdateCommission(CustId, NewCommisison, 0);
@@ -102,7 +106,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             _apiClient.UpdateCommissionAsync(default)
                 .ThrowsForAnyArgs(x => throw new Exception(ErrMsg));
 
-            var wrapper = new ExchangeClientWrapper(_apiClient, _logger, _cacheService);
+            var wrapper = CreateExchangeClientWrapper();
 
             // Action
             var result = await wrapper.UpdateCommission(CustId, NewCommisison, 0);
@@ -110,6 +114,11 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             // Assert
             Assert.That(result, Is.Null);
             _logger.Received(1).Error(Arg.Any<string>(), Arg.Any<Exception>());
+        }
+
+        private ExchangeClientWrapper CreateExchangeClientWrapper()
+        {
+            return new ExchangeClientWrapper(_apiClient, _logger, _cacheService, _dbFactory);
         }
     }
 }

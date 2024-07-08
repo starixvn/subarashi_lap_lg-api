@@ -161,6 +161,8 @@
     <Compile Include="Controllers\ExchangeController.cs" />
     <Compile Include="Controllers\ExchangeBetHistoryController.cs" />
     <Compile Include="Controllers\PortalController.cs" />
+    <Compile Include="Infrastructure\DbFactory.cs" />
+    <Compile Include="Infrastructure\IDbFactory.cs" />
     <Compile Include="Utility\ExchangeHelper.cs" />
     <Compile Include="Model\Configuration\PortalOptions.cs" />
     <Compile Include="Model\DataDomain\ExchangeReportConstants.cs" />

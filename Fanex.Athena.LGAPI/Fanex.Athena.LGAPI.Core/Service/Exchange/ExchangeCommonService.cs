@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
-using Fanex.Athena.LGAPI.Core.Utility;
-using Fanex.Caching;
-using Fanex.Data;
-using Fanex.Logging;
-using Fanex.ThirdParty.ExchangeProduct.HttpClients;
-
-namespace Fanex.Athena.LGAPI.Core.Service.Exchange
+﻿namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Fanex.Athena.LGAPI.Core.Infrastructure;
+    using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
+    using Fanex.Athena.LGAPI.Core.Utility;
+    using Fanex.Caching;
+    using Fanex.Logging;
+    using Fanex.ThirdParty.ExchangeProduct.HttpClients;
+
     public class ExchangeCommonService : IExchangeCommonService
     {
         protected readonly IExchangeHttpClient _apiClient;
@@ -19,22 +18,28 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         protected readonly ICacheService _cacheService;
 
+        protected readonly IDbFactory _dbFactory;
+
         private readonly int ExpirationTimeInMinute = 2;
 
-        public ExchangeCommonService(IExchangeHttpClient apiClient, ILogger logger, ICacheService cacheService)
+        public ExchangeCommonService(
+            IExchangeHttpClient apiClient,
+            ILogger logger,
+            ICacheService cacheService,
+            IDbFactory dbFactory)
         {
             _apiClient = apiClient;
             _logger = logger;
             _cacheService = cacheService;
+            _dbFactory = dbFactory;
         }
 
         public async Task<bool> IsUnderMaintenance()
         {
             const string cacheKey = "Exchange_Is_Under_Maintenance";
             var cachePolicy = new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(ExpirationTimeInMinute));
-            bool result = false;
 
-            if (_cacheService.TryGet<bool>(cacheKey, out result))
+            if (_cacheService.TryGet<bool>(cacheKey, out bool result))
             {
                 return result;
             }
@@ -59,19 +64,17 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         public IEnumerable<ExchangeLicenseeMapping> ExchangeLicenseeMappings()
         {
-            const string cacheKey = "ExchangeLicenseeMappings";
+            const string cacheKey = "Exchange_Licensee_Mappings";
             var cachePolicy = new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
-            var result = Enumerable.Empty<ExchangeLicenseeMapping>();
 
-            if (_cacheService.TryGet(cacheKey, out result))
+            if (_cacheService.TryGet(cacheKey, out IEnumerable<ExchangeLicenseeMapping> result))
             {
                 return result;
             }
 
-            const string spName = "Nap_LM_LicVendorInfo_Select";
-            const int timeout = 120;
-            var uspParams = new { pageSize = 1000 };
-            using (var db = ObjectDbFactory.CreateInstance(spName, timeout))
+            const string SpName = "Nap_LM_LicVendorInfo_Select";
+            var uspParams = new { pageIndex = 1, pageSize = 1000 };
+            using (var db = _dbFactory.GetObjectDb(SpName))
             {
                 result = db.Query<ExchangeLicenseeMapping>(uspParams);
                 _cacheService.Set(cacheKey, result, cachePolicy);

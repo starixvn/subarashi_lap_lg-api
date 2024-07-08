@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Fanex.Athena.LGAPI.Core.Infrastructure;
 using Fanex.Athena.LGAPI.Core.Model.DataDomain;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
@@ -29,17 +30,22 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         protected const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int DelayTime = 1000;
 
-        private static readonly int[] reportTypes = new[] { 
-            ExchangeReportConstants.Exchange, 
-            ExchangeReportConstants.Sportsbook, 
-            ExchangeReportConstants.Bookmaker, 
-            ExchangeReportConstants.FancyBet 
+        private static readonly int[] reportTypes = new[] {
+            ExchangeReportConstants.Exchange,
+            ExchangeReportConstants.Sportsbook,
+            ExchangeReportConstants.Bookmaker,
+            ExchangeReportConstants.FancyBet
         };
 
         private IEnumerable<ExchangeLicenseeMapping> SiteNameMapping => ExchangeLicenseeMappings();
 
-        public ExchangeBetHistoryService(IExchangeHttpClient apiClient, IAsyncPolicy<BetHistory> breaker, ICacheService cacheService, ILogger logger)
-            : base(apiClient, logger, cacheService)
+        public ExchangeBetHistoryService(
+            IExchangeHttpClient apiClient,
+            IAsyncPolicy<BetHistory> breaker,
+            ICacheService cacheService,
+            ILogger logger,
+            IDbFactory dbFactory)
+            : base(apiClient, logger, cacheService, dbFactory)
         {
             _breaker = breaker;
         }
@@ -48,10 +54,10 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         {
             var isUM = await IsUnderMaintenance();
 
-            //if (isUM)
-            //{
-            //    return new BetHistoryResult(UMCode);
-            //}
+            if (isUM)
+            {
+                return new BetHistoryResult(UMCode);
+            }
 
             if (!IsValidParam(metaModel))
             {

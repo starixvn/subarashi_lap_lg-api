@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Fanex.Athena.LGAPI.Core.Infrastructure;
 using Fanex.Athena.LGAPI.Core.Utility;
 using Fanex.Caching;
 using Fanex.Logging;
@@ -11,9 +12,12 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 {
     public class ExchangeClientWrapper : ExchangeCommonService, IExchangeClientWrapper
     {
-        public ExchangeClientWrapper(IExchangeHttpClient apiClient, ILogger logger, ICacheService cacheService) : base(apiClient, logger, cacheService)
-        {
-        }
+        public ExchangeClientWrapper(
+            IExchangeHttpClient apiClient,
+            ILogger logger,
+            ICacheService cacheService,
+            IDbFactory dbFactory)
+            : base(apiClient, logger, cacheService, dbFactory) { }
 
         public async Task<GetProfile> GetCommission(int custId, int groupMode)
         {

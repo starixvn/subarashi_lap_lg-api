@@ -2,10 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
+using Fanex.Athena.LGAPI.Core.Infrastructure;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
 using Fanex.Athena.LGAPI.Core.Service.Exchange;
 using Fanex.Caching;
+using Fanex.Data;
 using Fanex.Logging;
 using Fanex.ThirdParty.ExchangeProduct.Enums;
 using Fanex.ThirdParty.ExchangeProduct.HttpClients;
@@ -25,6 +27,8 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         private IAsyncPolicy<BetHistory> _breaker;
         private ICacheService _cacheService;
         private ILogger _logger;
+        private IDbFactory _dbFactory;
+        private IObjectDb _objectDb;
 
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int CodeForUM = 101;
@@ -39,6 +43,11 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             _breaker = Policy.NoOpAsync<BetHistory>();
             _cacheService = Substitute.For<ICacheService>();
             _logger = Substitute.For<ILogger>();
+            _dbFactory = Substitute.For<IDbFactory>();
+            _objectDb = Substitute.For<IObjectDb>();
+
+            _dbFactory.GetObjectDb(Arg.Any<string>(), Arg.Any<int>()).Returns(_objectDb);
+            _objectDb.ClearReceivedCalls();
         }
 
         [TearDown]
@@ -47,6 +56,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             _apiClient = null;
             _breaker = null;
             _cacheService = null;
+            _objectDb.ClearReceivedCalls();
         }
 
         [TestCase("WrongSitename", false, "", (int)CitiStatus.Success)]
@@ -60,8 +70,8 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
                 listSiteName.Add(new ExchangeLicenseeMapping { SiteId = 1, SiteName = siteName });
             }
 
-            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService, _logger);
-            service.ExchangeLicenseeMappings().Returns(listSiteName);
+            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService, _logger, _dbFactory);
+            _objectDb.Query<ExchangeLicenseeMapping>(Arg.Any<object>()).Returns(listSiteName);
 
             // Action
             var result = await service.GetVoidedData(metaModel);
