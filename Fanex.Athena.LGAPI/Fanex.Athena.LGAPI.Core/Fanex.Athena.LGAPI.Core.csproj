@@ -164,7 +164,6 @@
     <Compile Include="Utility\ExchangeHelper.cs" />
     <Compile Include="Model\Configuration\PortalOptions.cs" />
     <Compile Include="Model\DataDomain\ExchangeReportConstants.cs" />
-    <Compile Include="Controllers\SSASController.cs" />
     <Compile Include="Model\DTO\Exchange\BetHistoryItem.cs" />
     <Compile Include="Model\DTO\Exchange\BetHistoryResult.cs" />
     <Compile Include="Model\DTO\Exchange\ExchangeLicenseeMapping.cs" />
@@ -194,12 +193,6 @@
     <None Include="Fanex.Athena.LGAPI.Core.ruleset" />
     <None Include="app.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SSAS\Fanex.Athena.LGAPI.SSAS\Fanex.Athena.LGAPI.SSAS.csproj">
-      <Project>{9fa4b4d1-87ee-4227-837a-b897e6dabfd8}</Project>
-      <Name>Fanex.Athena.LGAPI.SSAS</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

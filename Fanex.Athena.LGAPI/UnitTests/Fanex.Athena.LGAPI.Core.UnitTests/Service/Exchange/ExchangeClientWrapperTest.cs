@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AutoFixture;
 using Fanex.Athena.LGAPI.Core.Service.Exchange;
 using Fanex.Caching;
 using Fanex.Logging;
@@ -16,6 +17,8 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
     [TestFixture]
     public class ExchangeClientWrapperTest
     {
+        private readonly Fixture _fixture = new Fixture();
+
         private IExchangeHttpClient _apiClient;
 
         private ILogger _logger;
@@ -43,8 +46,9 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         public async Task GetCommission_WhenCall_ReturnCorrectResult()
         {
             // Arrange
-            var expectedResult = new ResponseResult<GetProfile> { Result = new GetProfile() };
-            _apiClient.GetProfileAsync(default).ReturnsForAnyArgs(expectedResult);
+            var expectedResult = _fixture.Create<GetProfile>();
+
+            _apiClient.GetProfileAsync(Arg.Any<GetProfileParam>()).ReturnsForAnyArgs(new ResponseResult<GetProfile> { Result = expectedResult });
 
             var wrapper = new ExchangeClientWrapper(_apiClient, _logger, _cacheService);
 
@@ -78,7 +82,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             // Arrange
             const double NewCommisison = 0.5;
             var expectedResult = new CommissionInfo();
-             _apiClient.UpdateCommissionAsync(default).ReturnsForAnyArgs(Task.FromResult(new ResponseResult<CommissionInfo> { Result = expectedResult }));
+            _apiClient.UpdateCommissionAsync(default).ReturnsForAnyArgs(Task.FromResult(new ResponseResult<CommissionInfo> { Result = expectedResult }));
 
             var wrapper = new ExchangeClientWrapper(_apiClient, _logger, _cacheService);
 

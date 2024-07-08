@@ -5,7 +5,6 @@ using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Fanex.Athena.LGAPI.Core.Utility;
-using Fanex.Athena.LGAPI.SSAS.Configuration;
 using Fanex.Data;
 using Fanex.Data.SqlServer;
 using Fanex.Logging;
@@ -24,15 +23,12 @@ namespace Fanex.Athena.LGAPI
                     Dsn = new Dsn(ConfigurationManager.AppSettings["Sentry-Dsn"])
                 }));
 
-            CubeSettingProvider.UseTabularCube();
-
             DbSettingProviderManager
               .StartNewSession()
               .WithSqlServer()
               .UseDefaultConnectionStringProvider()
               .UseDefaultDbSettingProvider(resourcePath: "~/App_Data")
               .Run();
-
             DIConfig.Register();
 
             AreaRegistration.RegisterAllAreas();

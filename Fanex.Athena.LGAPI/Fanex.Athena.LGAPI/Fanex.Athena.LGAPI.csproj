@@ -281,10 +281,6 @@
       <Project>{0b19f5b0-605d-49ca-81ee-939418420f97}</Project>
       <Name>Fanex.Athena.LGAPI.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SSAS\Fanex.Athena.LGAPI.SSAS\Fanex.Athena.LGAPI.SSAS.csproj">
-      <Project>{9fa4b4d1-87ee-4227-837a-b897e6dabfd8}</Project>
-      <Name>Fanex.Athena.LGAPI.SSAS</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

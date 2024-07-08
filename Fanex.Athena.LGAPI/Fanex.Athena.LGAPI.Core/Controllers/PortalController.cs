@@ -1,9 +1,9 @@
-﻿using Fanex.Athena.LGAPI.Core.Attributes;
-using Fanex.Athena.LGAPI.Core.Model.MetalModel;
-using Fanex.Athena.LGAPI.Core.Service;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using Fanex.Athena.LGAPI.Core.Attributes;
+using Fanex.Athena.LGAPI.Core.Model.MetalModel;
+using Fanex.Athena.LGAPI.Core.Service;
 
 namespace Fanex.Athena.LGAPI.Core.Controllers
 {
