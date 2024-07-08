@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Fanex.Athena.LGAPI.Core.Utility;
 using Fanex.Athena.LGAPI.SSAS.Configuration;
+using Fanex.Data;
+using Fanex.Data.SqlServer;
 using Fanex.Logging;
 using Fanex.Logging.Sentry.RavenClient;
 using SharpRaven;
@@ -23,6 +25,13 @@ namespace Fanex.Athena.LGAPI
                 }));
 
             CubeSettingProvider.UseTabularCube();
+
+            DbSettingProviderManager
+              .StartNewSession()
+              .WithSqlServer()
+              .UseDefaultConnectionStringProvider()
+              .UseDefaultDbSettingProvider(resourcePath: "~/App_Data")
+              .Run();
 
             DIConfig.Register();
 

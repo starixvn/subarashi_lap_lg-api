@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Utility;
 using Fanex.Caching;
+using Fanex.Data;
 using Fanex.Logging;
 using Fanex.ThirdParty.ExchangeProduct.HttpClients;
 
@@ -50,6 +54,28 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
                 _cacheService.Set<bool>(cacheKey, true, cachePolicy);
 
                 return true;
+            }
+        }
+
+        public IEnumerable<ExchangeLicenseeMapping> ExchangeLicenseeMappings()
+        {
+            const string cacheKey = "ExchangeLicenseeMappings";
+            var cachePolicy = new CacheItemOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(30));
+            var result = Enumerable.Empty<ExchangeLicenseeMapping>();
+
+            if (_cacheService.TryGet(cacheKey, out result))
+            {
+                return result;
+            }
+
+            const string spName = "Nap_LM_LicVendorInfo_Select";
+            const int timeout = 120;
+            var uspParams = new { pageSize = 1000 };
+            using (var db = ObjectDbFactory.CreateInstance(spName, timeout))
+            {
+                result = db.Query<ExchangeLicenseeMapping>(uspParams);
+                _cacheService.Set(cacheKey, result, cachePolicy);
+                return result;
             }
         }
     }

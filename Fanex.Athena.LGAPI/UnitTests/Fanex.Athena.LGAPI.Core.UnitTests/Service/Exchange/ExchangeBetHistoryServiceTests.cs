@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
-using Fanex.Athena.LGAPI.Core.Model.DataDomain;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
 using Fanex.Athena.LGAPI.Core.Service.Exchange;
@@ -25,7 +24,6 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         private IExchangeHttpClient _apiClient;
         private IAsyncPolicy<BetHistory> _breaker;
         private ICacheService _cacheService;
-        private IExchangeSetting _exchangeSetting;
         private ILogger _logger;
 
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
@@ -40,7 +38,6 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             _apiClient = Substitute.For<IExchangeHttpClient>();
             _breaker = Policy.NoOpAsync<BetHistory>();
             _cacheService = Substitute.For<ICacheService>();
-            _exchangeSetting = Substitute.For<IExchangeSetting>();
             _logger = Substitute.For<ILogger>();
         }
 
@@ -60,11 +57,11 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             var listSiteName = new List<ExchangeLicenseeMapping>();
             if (isValidSiteName)
             {
-                listSiteName.Add(new ExchangeLicenseeMapping { ExchangeId = 1, Name = siteName });
+                listSiteName.Add(new ExchangeLicenseeMapping { SiteId = 1, SiteName = siteName });
             }
-            _exchangeSetting.ExchangeLicenseeMappings.Returns(listSiteName);
 
-            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService, _exchangeSetting, _logger);
+            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService, _logger);
+            service.ExchangeLicenseeMappings().Returns(listSiteName);
 
             // Action
             var result = await service.GetVoidedData(metaModel);
@@ -79,7 +76,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             });
         }
 
-        private static ExchangeGettingVoidedMetaModel CreateMetaModel(string siteName = SiteName.OneTwoBet, string refNo = "", int custId = 0)
+        private static ExchangeGettingVoidedMetaModel CreateMetaModel(string siteName = "12bet", string refNo = "", int custId = 0)
         {
             var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
             metaModel.SiteName = siteName;

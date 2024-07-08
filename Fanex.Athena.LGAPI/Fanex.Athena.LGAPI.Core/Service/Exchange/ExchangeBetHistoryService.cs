@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Fanex.Athena.LGAPI.Core.Model.DataDomain;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
+using Fanex.Athena.LGAPI.Core.Utility;
 using Fanex.Caching;
 using Fanex.Logging;
 using Fanex.ThirdParty.ExchangeProduct.Enums;
@@ -19,7 +20,6 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
     public class ExchangeBetHistoryService : ExchangeCommonService, IExchangeBetHistoryService
     {
         private readonly IAsyncPolicy<BetHistory> _breaker;
-        private readonly IExchangeSetting _setting;
 
         private const int DefaultTimeZone = 8;
         private const int ExpirationTimeInMinute = 10;
@@ -28,25 +28,30 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         private const int UMCode = (int)CitiStatus.Under_Maintainence;
         protected const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int DelayTime = 1000;
-        private static readonly int[] reportTypes = new[] { ExchangeReportConstants.Exchange, ExchangeReportConstants.Sportsbook, ExchangeReportConstants.Bookmaker, ExchangeReportConstants.FancyBet };
 
-        private IEnumerable<ExchangeLicenseeMapping> SiteNameMapping => _setting.ExchangeLicenseeMappings;
+        private static readonly int[] reportTypes = new[] { 
+            ExchangeReportConstants.Exchange, 
+            ExchangeReportConstants.Sportsbook, 
+            ExchangeReportConstants.Bookmaker, 
+            ExchangeReportConstants.FancyBet 
+        };
 
-        public ExchangeBetHistoryService(IExchangeHttpClient apiClient, IAsyncPolicy<BetHistory> breaker, ICacheService cacheService, IExchangeSetting setting, ILogger logger)
+        private IEnumerable<ExchangeLicenseeMapping> SiteNameMapping => ExchangeLicenseeMappings();
+
+        public ExchangeBetHistoryService(IExchangeHttpClient apiClient, IAsyncPolicy<BetHistory> breaker, ICacheService cacheService, ILogger logger)
             : base(apiClient, logger, cacheService)
         {
             _breaker = breaker;
-            _setting = setting;
         }
 
         public async Task<BetHistoryResult> GetVoidedData(ExchangeGettingVoidedMetaModel metaModel)
         {
             var isUM = await IsUnderMaintenance();
 
-            if (isUM)
-            {
-                return new BetHistoryResult(UMCode);
-            }
+            //if (isUM)
+            //{
+            //    return new BetHistoryResult(UMCode);
+            //}
 
             if (!IsValidParam(metaModel))
             {
@@ -82,7 +87,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         private bool IsValidParam(ExchangeGettingVoidedMetaModel metaModel)
         {
-            var isValidSiteName = SiteNameMapping.Any(_ => _.Name.Equals(metaModel.SiteName, StringComparison.InvariantCultureIgnoreCase));
+            var isValidSiteName = SiteNameMapping.Any(_ => _.SiteName.Equals(metaModel.SiteName, StringComparison.InvariantCultureIgnoreCase));
             var isValidRefno = string.IsNullOrEmpty(metaModel.RefNo) || long.TryParse(metaModel.RefNo, out _);
             return isValidSiteName && isValidRefno;
         }
@@ -131,7 +136,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
             param.StartTime = selectedDate.ToString(DateTimeFormat);
             param.EndTime = selectedDate.AddDays(1).ToString(DateTimeFormat);
-            param.GroupMode = string.Equals(SiteName.OneTwoBet, param.SiteName, StringComparison.OrdinalIgnoreCase) ? (int)GroupMode.OneTwoBet : (int)GroupMode.Other;
+            param.GroupMode = ExchangeHelper.GetGroupModeBySiteName(param.SiteName);
         }
 
         private static bool IsSuccess(int status) => status == SuccessCode || status == 0;
@@ -171,7 +176,7 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 
         private IEnumerable<BetHistoryResultList> GetCustDataBySite(ExchangeGettingVoidedMetaModel param, List<ReportTypeItemsDTO> totalItemsByType)
         {
-            var siteId = SiteNameMapping.FirstOrDefault(_ => _.Name.Equals(param.SiteName, StringComparison.InvariantCultureIgnoreCase))?.ExchangeId;
+            var siteId = SiteNameMapping.FirstOrDefault(_ => _.SiteName.Equals(param.SiteName, StringComparison.InvariantCultureIgnoreCase))?.SiteId;
             if (siteId == null)
             {
                 return Enumerable.Empty<BetHistoryResultList>();

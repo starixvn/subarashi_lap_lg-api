@@ -56,11 +56,26 @@
     <Reference Include="Autofac.Integration.WebApi, Version=4.2.1.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
       <HintPath>..\packages\Autofac.WebApi2.4.2.1\lib\net45\Autofac.Integration.WebApi.dll</HintPath>
     </Reference>
+    <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.2.0.30\lib\net461\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="Fanex.Caching, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Fanex.Caching.2.2.1\lib\net461\Fanex.Caching.dll</HintPath>
     </Reference>
     <Reference Include="Fanex.Caching.Redis, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Fanex.Caching.Redis.2.2.1\lib\net461\Fanex.Caching.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="Fanex.Data, Version=4.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fanex.Data.4.2.2\lib\net461\Fanex.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Fanex.Data.DbSettingProviderExtension, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fanex.Data.DbSettingProviderExtension.1.0.0.1\lib\net40\Fanex.Data.DbSettingProviderExtension.dll</HintPath>
+    </Reference>
+    <Reference Include="Fanex.Data.Repository, Version=4.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fanex.Data.Repository.4.2.2\lib\net461\Fanex.Data.Repository.dll</HintPath>
+    </Reference>
+    <Reference Include="Fanex.Data.SqlServer, Version=4.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fanex.Data.SqlServer.4.2.2\lib\net461\Fanex.Data.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Fanex.Logging, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Fanex.Logging.2.0.1\lib\net461\Fanex.Logging.dll</HintPath>
@@ -129,6 +144,7 @@
       <Private>True</Private>
       <Private>True</Private>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Security.Cryptography.Algorithms, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Security.Cryptography.Algorithms.4.3.0\lib\net461\System.Security.Cryptography.Algorithms.dll</HintPath>
       <Private>True</Private>
@@ -155,6 +171,7 @@
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.1\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="System.Transactions" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
     </Reference>
@@ -221,6 +238,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\FanexSpName.xml" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Web.config" />
@@ -234,21 +252,11 @@
   <ItemGroup />
   <ItemGroup>
     <Content Include="Fanex.Athena.LGAPI.ruleset" />
-    <Content Include="App_Data\ExchangeLicenseeMapping.json" />
-    <Content Include="App_Data\ExchangeLicenseeMapping.SIT.json" />
-    <Content Include="App_Data\ExchangeLicenseeMapping.PRO.json" />
-    <Content Include="App_Data\ExchangeLicenseeMapping.LOCAL.json" />
-    <Content Include="App_Data\ExchangeLicenseeMapping.UAT.json" />
-    <Content Include="App_Data\ExchangeLicenseeMapping.AWS.json" />
-    <Content Include="App_Data\ExchangeLicenseeMapping.KLDR.json" />
     <None Include="packages.config" />
-    <Content Include="SiteConfig\Web.AppSettings.BACKUPMNL.config" />
     <Content Include="SiteConfig\Web.AppSettings.LOCAL.config" />
     <Content Include="SiteConfig\Web.AppSettings.PRO.config" />
     <Content Include="SiteConfig\Web.AppSettings.SIT.config" />
     <Content Include="SiteConfig\Web.AppSettings.UAT.config" />
-    <Content Include="SiteConfig\Web.BACKUPMNL.config" />
-    <Content Include="SiteConfig\Web.ConnectionStrings.BACKUPMNL.config" />
     <Content Include="SiteConfig\Web.ConnectionStrings.DEV.config" />
     <Content Include="SiteConfig\Web.ConnectionStrings.LOCAL.config" />
     <Content Include="SiteConfig\Web.ConnectionStrings.PRO.config" />
@@ -261,9 +269,6 @@
     <Content Include="SiteConfig\Web.UAT.config" />
     <Content Include="Web.AppSettings.config" />
     <Content Include="Web.ConnectionStrings.config" />
-    <Content Include="SiteConfig\Web.AppSettings.AWS.config" />
-    <Content Include="SiteConfig\Web.ConnectionStrings.AWS.config" />
-    <Content Include="SiteConfig\Web.AWS.config" />
     <Content Include="SiteConfig\Web.AppSettings.KLDR.config" />
     <Content Include="SiteConfig\Web.ConnectionStrings.KLDR.config" />
     <Content Include="SiteConfig\Web.KLDR.config" />

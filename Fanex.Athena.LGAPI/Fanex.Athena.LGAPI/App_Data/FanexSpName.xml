@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Functions>
+	<Function Name="Site.Nap.Licensee.VendorInfoManagement">
+		<Setting Key="Nap_LM_LicVendorInfo_Select" SpName="Nap_LM_LicVendorInfo_Select" DbName="DBCUST.SiteConfig.wsv_lap"></Setting>
+	</Function>
+</Functions>
