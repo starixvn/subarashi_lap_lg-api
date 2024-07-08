@@ -274,5 +274,9 @@
   {
     "name": "TBETINR",
     "exchangeId": 4314000
+  },
+  {
+    "name": "JVD1",
+    "exchangeId": 4331800
   }
 ]
