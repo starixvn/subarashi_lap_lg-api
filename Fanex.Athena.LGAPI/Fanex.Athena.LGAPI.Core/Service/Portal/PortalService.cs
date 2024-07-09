@@ -1,11 +1,11 @@
-﻿using Fanex.Athena.LGAPI.Core.Model.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
+using Fanex.Athena.LGAPI.Core.Model.Configuration;
 
 namespace Fanex.Athena.LGAPI.Core.Service
 {

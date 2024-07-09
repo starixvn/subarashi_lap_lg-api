@@ -1,6 +1,5 @@
-﻿
+﻿using System.Threading.Tasks;
 using Fanex.ThirdParty.ExchangeProduct.Model;
-using System.Threading.Tasks;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
 {
@@ -11,6 +10,5 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
         Task<CommissionInfo> UpdateCommission(int custId, double newCommission, int groupMode);
 
         Task<bool> IsUnderMaintenance();
-
     }
 }

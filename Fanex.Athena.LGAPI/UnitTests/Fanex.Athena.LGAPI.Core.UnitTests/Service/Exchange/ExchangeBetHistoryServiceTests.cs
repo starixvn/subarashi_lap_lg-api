@@ -2,11 +2,12 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
-using Fanex.Athena.LGAPI.Core.Model.DataDomain;
+using Fanex.Athena.LGAPI.Core.Infrastructure;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange;
 using Fanex.Athena.LGAPI.Core.Service.Exchange;
 using Fanex.Caching;
+using Fanex.Data;
 using Fanex.Logging;
 using Fanex.ThirdParty.ExchangeProduct.Enums;
 using Fanex.ThirdParty.ExchangeProduct.HttpClients;
@@ -25,8 +26,9 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
         private IExchangeHttpClient _apiClient;
         private IAsyncPolicy<BetHistory> _breaker;
         private ICacheService _cacheService;
-        private IExchangeSetting _exchangeSetting;
         private ILogger _logger;
+        private IDbFactory _dbFactory;
+        private IObjectDb _objectDb;
 
         private const string DateTimeFormat = "yyyy-MM-dd HH:mm";
         private const int CodeForUM = 101;
@@ -40,8 +42,12 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             _apiClient = Substitute.For<IExchangeHttpClient>();
             _breaker = Policy.NoOpAsync<BetHistory>();
             _cacheService = Substitute.For<ICacheService>();
-            _exchangeSetting = Substitute.For<IExchangeSetting>();
             _logger = Substitute.For<ILogger>();
+            _dbFactory = Substitute.For<IDbFactory>();
+            _objectDb = Substitute.For<IObjectDb>();
+
+            _dbFactory.GetObjectDb(Arg.Any<string>(), Arg.Any<int>()).Returns(_objectDb);
+            _objectDb.ClearReceivedCalls();
         }
 
         [TearDown]
@@ -50,6 +56,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             _apiClient = null;
             _breaker = null;
             _cacheService = null;
+            _objectDb.ClearReceivedCalls();
         }
 
         [TestCase("WrongSitename", false, "", (int)CitiStatus.Success)]
@@ -60,11 +67,11 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             var listSiteName = new List<ExchangeLicenseeMapping>();
             if (isValidSiteName)
             {
-                listSiteName.Add(new ExchangeLicenseeMapping { ExchangeId = 1, Name = siteName });
+                listSiteName.Add(new ExchangeLicenseeMapping { SiteId = 1, SiteName = siteName });
             }
-            _exchangeSetting.ExchangeLicenseeMappings.Returns(listSiteName);
 
-            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService, _exchangeSetting, _logger);
+            var service = new ExchangeBetHistoryService(_apiClient, _breaker, _cacheService, _logger, _dbFactory);
+            _objectDb.Query<ExchangeLicenseeMapping>(Arg.Any<object>()).Returns(listSiteName);
 
             // Action
             var result = await service.GetVoidedData(metaModel);
@@ -79,7 +86,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Service.Exchange
             });
         }
 
-        private static ExchangeGettingVoidedMetaModel CreateMetaModel(string siteName = SiteName.OneTwoBet, string refNo = "", int custId = 0)
+        private static ExchangeGettingVoidedMetaModel CreateMetaModel(string siteName = "12bet", string refNo = "", int custId = 0)
         {
             var metaModel = _fixture.Create<ExchangeGettingVoidedMetaModel>();
             metaModel.SiteName = siteName;

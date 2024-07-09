@@ -3,6 +3,7 @@
     public class GetLeagueGroupsMetaModel
     {
         public int SportType { get; set; }
+
         public string LangCode { get; set; }
     }
 }

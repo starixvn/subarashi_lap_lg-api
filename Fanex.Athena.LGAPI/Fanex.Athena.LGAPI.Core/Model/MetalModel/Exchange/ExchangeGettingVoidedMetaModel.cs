@@ -17,7 +17,9 @@ namespace Fanex.Athena.LGAPI.Core.Model.MetalModel.Exchange
         public int ReportType { get; set; }
 
         public string SelectedDateStr => string.Format("{0}_GMT{1}", SelectedDate.ToString("yyyyMMdd"), TimeZone);
+
         public string StartTime { get; set; }
+
         public string EndTime { get; set; }
 
         public ExchangeGettingVoidedMetaModel Clone()

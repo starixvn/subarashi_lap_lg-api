@@ -1,10 +1,20 @@
-﻿using Autofac;
+﻿using System;
+using System.Configuration;
+using System.Linq;
+using System.Net.Http;
+using System.Reflection;
+using System.Text;
+using System.Web.Compilation;
+using System.Web.Http;
+using System.Web.Mvc;
+using System.Web.Hosting;
+using System.Web.Http;
+using System.Web.Mvc;
+using Autofac;
 using Autofac.Integration.Mvc;
 using Autofac.Integration.WebApi;
 using Fanex.Athena.LGAPI.Core.Model.Configuration;
-using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
 using Fanex.Athena.LGAPI.Core.Service;
-using Fanex.Athena.LGAPI.Core.Service.Exchange;
 using Fanex.Athena.LGAPI.Core.Utility;
 using Fanex.Caching;
 using Fanex.Caching.Redis;
@@ -13,20 +23,7 @@ using Fanex.ThirdParty.ExchangeProduct;
 using Fanex.ThirdParty.ExchangeProduct.Enums;
 using Fanex.ThirdParty.ExchangeProduct.HttpClients;
 using Fanex.ThirdParty.ExchangeProduct.Model;
-using Newtonsoft.Json;
 using Polly;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Reflection;
-using System.Text;
-using System.Web.Compilation;
-using System.Web.Hosting;
-using System.Web.Http;
-using System.Web.Mvc;
 
 namespace Fanex.Athena.LGAPI
 {
@@ -47,21 +44,12 @@ namespace Fanex.Athena.LGAPI
             RegisterCircuitBreaker(builder);
             RegisterSingleton(builder);
 
-            RegisterExchangeSetting(builder);
-
             builder.RegisterControllers(assemblies);
             builder.RegisterApiControllers(assemblies);
 
             var container = builder.Build();
             DependencyResolver.SetResolver(new AutofacDependencyResolver(container));
             config.DependencyResolver = new AutofacWebApiDependencyResolver(container);
-        }
-
-        private static void RegisterExchangeSetting(ContainerBuilder builder)
-        {
-            builder.Register(x => new ExchangeSetting { ExchangeLicenseeMappings = GetExchangeLicenseeMapping()})
-                .As<IExchangeSetting>()
-                .SingleInstance();
         }
 
         private static void RegisterThirdpartyServices(ContainerBuilder builder)
@@ -142,16 +130,6 @@ namespace Fanex.Athena.LGAPI
 
             return assemblies.Where(x => x.FullName.StartsWith("Fanex.Athena.LGAPI", StringComparison.InvariantCulture))
                 .ToArray();
-        }
-
-        private static IEnumerable<ExchangeLicenseeMapping> GetExchangeLicenseeMapping()
-        {
-            var FilePath = $"~/App_Data/ExchangeLicenseeMapping.{ConfigurationManager.AppSettings["Evr"]}.json";
-            using (var reader = new StreamReader(HostingEnvironment.MapPath(FilePath)))
-            {
-                var json = reader.ReadToEnd();
-                return JsonConvert.DeserializeObject<IEnumerable<ExchangeLicenseeMapping>>(json);
-            }
         }
     }
 }

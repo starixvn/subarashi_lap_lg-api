@@ -14,7 +14,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Controllers
     [TestFixture]
     public class ExchangeControllerTest
     {
-        private static Fixture _fixture = new Fixture();
+        private readonly Fixture _fixture = new Fixture();
 
         private IExchangeClientWrapper _exchangeWrapper;
 
@@ -37,7 +37,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Controllers
             var metaModel = _fixture.Create<ExchangeBaseMetaModel>();
             var expectedProfile = _fixture.Create<GetProfile>();
 
-            _exchangeWrapper.GetCommission(metaModel.CustId, 0).Returns(expectedProfile);
+            _exchangeWrapper.GetCommission(metaModel.CustId, metaModel.GroupMode).Returns(expectedProfile);
             var expectedResult = JsonConvert.SerializeObject(new { Data = expectedProfile });
 
             using (var controller = new ExchangeController(_exchangeWrapper))
@@ -58,7 +58,7 @@ namespace Fanex.Athena.LGAPI.Core.UnitTests.Controllers
             var metaModel = _fixture.Create<ExchangeUpdatingCommissionMetaModel>();
             var commissionInfo = _fixture.Create<CommissionInfo>();
 
-            _exchangeWrapper.UpdateCommission(metaModel.CustId, metaModel.Commission, 0)
+            _exchangeWrapper.UpdateCommission(metaModel.CustId, metaModel.Commission, metaModel.GroupMode)
                 .Returns(commissionInfo);
             var expectedResult = JsonConvert.SerializeObject(new { Data = commissionInfo });
 

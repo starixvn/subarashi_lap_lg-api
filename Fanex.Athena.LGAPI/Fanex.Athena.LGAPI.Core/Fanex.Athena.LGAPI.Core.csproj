@@ -33,11 +33,20 @@
     <CodeAnalysisRuleSet>Fanex.Athena.LGAPI.Core.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Dapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Dapper.2.0.30\lib\net461\Dapper.dll</HintPath>
+    </Reference>
     <Reference Include="Fanex.Caching, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Fanex.Caching.2.2.1\lib\net461\Fanex.Caching.dll</HintPath>
     </Reference>
     <Reference Include="Fanex.Caching.Redis, Version=2.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Fanex.Caching.Redis.2.2.1\lib\net461\Fanex.Caching.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="Fanex.Data, Version=4.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fanex.Data.4.2.2\lib\net461\Fanex.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Fanex.Data.Repository, Version=4.2.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fanex.Data.Repository.4.2.2\lib\net461\Fanex.Data.Repository.dll</HintPath>
     </Reference>
     <Reference Include="Fanex.Logging, Version=2.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Fanex.Logging.2.0.1\lib\net461\Fanex.Logging.dll</HintPath>
@@ -90,6 +99,7 @@
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Security.Cryptography.Algorithms, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Security.Cryptography.Algorithms.4.3.0\lib\net461\System.Security.Cryptography.Algorithms.dll</HintPath>
       <Private>True</Private>
@@ -116,6 +126,7 @@
     <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.1\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
     </Reference>
+    <Reference Include="System.Transactions" />
     <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
     </Reference>
@@ -150,11 +161,11 @@
     <Compile Include="Controllers\ExchangeController.cs" />
     <Compile Include="Controllers\ExchangeBetHistoryController.cs" />
     <Compile Include="Controllers\PortalController.cs" />
+    <Compile Include="Infrastructure\DbFactory.cs" />
+    <Compile Include="Infrastructure\IDbFactory.cs" />
+    <Compile Include="Utility\ExchangeHelper.cs" />
     <Compile Include="Model\Configuration\PortalOptions.cs" />
     <Compile Include="Model\DataDomain\ExchangeReportConstants.cs" />
-    <Compile Include="Model\DataDomain\ExchangeSiteId.cs" />
-    <Compile Include="Controllers\SSASController.cs" />
-    <Compile Include="Model\DataDomain\SiteName.cs" />
     <Compile Include="Model\DTO\Exchange\BetHistoryItem.cs" />
     <Compile Include="Model\DTO\Exchange\BetHistoryResult.cs" />
     <Compile Include="Model\DTO\Exchange\ExchangeLicenseeMapping.cs" />
@@ -172,11 +183,9 @@
     <Compile Include="Service\Exchange\ExchangeClientWrapper.cs" />
     <Compile Include="Service\Exchange\ExchangeBetHistoryService.cs" />
     <Compile Include="Service\Exchange\ExchangeCommonService.cs" />
-    <Compile Include="Service\Exchange\ExchangeSetting.cs" />
     <Compile Include="Service\Exchange\IExchangeClientWrapper.cs" />
     <Compile Include="Service\Exchange\IExchangeBetHistoryService.cs" />
     <Compile Include="Service\Exchange\IExchangeCommonService.cs" />
-    <Compile Include="Service\Exchange\IExchangeSetting.cs" />
     <Compile Include="Service\Portal\IPortalService.cs" />
     <Compile Include="Service\Portal\PortalService.cs" />
     <Compile Include="Utility\DateTimeHelper.cs" />
@@ -187,11 +196,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\SSAS\Fanex.Athena.LGAPI.SSAS\Fanex.Athena.LGAPI.SSAS.csproj">
-      <Project>{9fa4b4d1-87ee-4227-837a-b897e6dabfd8}</Project>
-      <Name>Fanex.Athena.LGAPI.SSAS</Name>
-    </ProjectReference>
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
