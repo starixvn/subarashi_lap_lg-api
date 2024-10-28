@@ -176,9 +176,6 @@
     <Compile Include="Model\MetalModel\Portal\GetLeagueGroupsMetaModel.cs" />
     <Compile Include="Model\MetalModel\Portal\GetSpecialLeaguesMetaModel.cs" />
     <Compile Include="Model\MetalModel\Portal\GetLimitLeaguesMetaModel.cs" />
-    <Compile Include="Model\MetalModel\SSAS\QueryMultipleMetaModel.cs" />
-    <Compile Include="Model\MetalModel\SSAS\BaseSSASMetaModel.cs" />
-    <Compile Include="Model\MetalModel\SSAS\QueryMetaModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Service\Exchange\ExchangeClientWrapper.cs" />
     <Compile Include="Service\Exchange\ExchangeBetHistoryService.cs" />
