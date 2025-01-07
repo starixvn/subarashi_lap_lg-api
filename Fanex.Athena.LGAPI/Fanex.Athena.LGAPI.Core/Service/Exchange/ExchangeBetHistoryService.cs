@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web.Helpers;
 using Fanex.Athena.LGAPI.Core.Infrastructure;
 using Fanex.Athena.LGAPI.Core.Model.DataDomain;
 using Fanex.Athena.LGAPI.Core.Model.DTO.Exchange;
@@ -14,6 +15,7 @@ using Fanex.ThirdParty.ExchangeProduct.Enums;
 using Fanex.ThirdParty.ExchangeProduct.HttpClients;
 using Fanex.ThirdParty.ExchangeProduct.Model;
 using Fanex.ThirdParty.ExchangeProduct.Params;
+using Newtonsoft.Json;
 using Polly;
 
 namespace Fanex.Athena.LGAPI.Core.Service.Exchange
@@ -74,6 +76,8 @@ namespace Fanex.Athena.LGAPI.Core.Service.Exchange
             await GetAllDataByCustId(metaModel, totalItemsByType);
 
             var apiData = GetCustDataBySite(metaModel, totalItemsByType);
+
+            LogService.Info($"refno {metaModel.RefNo}: {JsonConvert.SerializeObject(apiData)}");
 
             if (apiData == null)
             {
