@@ -274,6 +274,15 @@
     <Content Include="SiteConfig\Web.AppSettings.KLDR.config" />
     <Content Include="SiteConfig\Web.ConnectionStrings.KLDR.config" />
     <Content Include="SiteConfig\Web.KLDR.config" />
+    <Content Include="SiteConfig\Web.AppSettings.KLPROD.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SiteConfig\Web.ConnectionStrings.KLPROD.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SiteConfig\Web.KLPROD.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
