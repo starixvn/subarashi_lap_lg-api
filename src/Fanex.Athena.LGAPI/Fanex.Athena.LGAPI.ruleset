@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RuleSet Name="SonarQube - Sparta / LAP.LGAPI Nexcel CSharp" ToolsVersion="15.0">
+  <Include Path="..\.sonarlint\sparta_lap.lgapicsharp.ruleset" Action="Default" />
+  <!-- Exclude non-testable configuration files from code coverage -->
+  <Rules AnalyzerId="SonarAnalyzer.CSharp" RuleNamespace="SonarAnalyzer.CSharp">
+    <Rule Id="S2094" Action="None" /> <!-- Empty classes should be removed -->
+  </Rules>
+</RuleSet>

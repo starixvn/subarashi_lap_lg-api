@@ -1,0 +1,53 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33403.182
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fanex.Athena.LGAPI", "src\Fanex.Athena.LGAPI\Fanex.Athena.LGAPI.csproj", "{6A47B1C0-BFFF-4A02-AB0B-8971E8D99056}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fanex.Athena.LGAPI.Core", "src\Fanex.Athena.LGAPI.Core\Fanex.Athena.LGAPI.Core.csproj", "{0B19F5B0-605D-49CA-81EE-939418420F97}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{DAC09794-BD1E-4417-88C9-24EF712510D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fanex.Athena.LGAPI.Core.UnitTests", "test\Fanex.Athena.LGAPI.Core.UnitTests\Fanex.Athena.LGAPI.Core.UnitTests.csproj", "{CA7A8775-A9FF-42EE-80D1-7AD742DBD69F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fanex.Athena.LGAPI.UnitTests", "test\Fanex.Athena.LGAPI.UnitTests\Fanex.Athena.LGAPI.UnitTests.csproj", "{B8A1A2E3-4D5F-4C7A-9E2B-1F3A5B7C9D0E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6A47B1C0-BFFF-4A02-AB0B-8971E8D99056}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A47B1C0-BFFF-4A02-AB0B-8971E8D99056}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A47B1C0-BFFF-4A02-AB0B-8971E8D99056}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A47B1C0-BFFF-4A02-AB0B-8971E8D99056}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B19F5B0-605D-49CA-81EE-939418420F97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B19F5B0-605D-49CA-81EE-939418420F97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B19F5B0-605D-49CA-81EE-939418420F97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B19F5B0-605D-49CA-81EE-939418420F97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA7A8775-A9FF-42EE-80D1-7AD742DBD69F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA7A8775-A9FF-42EE-80D1-7AD742DBD69F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA7A8775-A9FF-42EE-80D1-7AD742DBD69F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA7A8775-A9FF-42EE-80D1-7AD742DBD69F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8A1A2E3-4D5F-4C7A-9E2B-1F3A5B7C9D0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8A1A2E3-4D5F-4C7A-9E2B-1F3A5B7C9D0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8A1A2E3-4D5F-4C7A-9E2B-1F3A5B7C9D0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8A1A2E3-4D5F-4C7A-9E2B-1F3A5B7C9D0E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6A47B1C0-BFFF-4A02-AB0B-8971E8D99056} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{0B19F5B0-605D-49CA-81EE-939418420F97} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{CA7A8775-A9FF-42EE-80D1-7AD742DBD69F} = {DAC09794-BD1E-4417-88C9-24EF712510D6}
+		{B8A1A2E3-4D5F-4C7A-9E2B-1F3A5B7C9D0E} = {DAC09794-BD1E-4417-88C9-24EF712510D6}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0456540E-ADDB-4DC7-8C8D-D6BD542C3DE6}
+	EndGlobalSection
+EndGlobal

@@ -30,4 +30,6 @@ _ReSharper*/
 .vs/
 #Nuget packages folder
 packages/
-/Fanex.Athena.LGAPI/cireport
+cireport/
+UnitTestCoverage_*.xml
+UnitTestResult_*.xml
