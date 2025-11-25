@@ -25,7 +25,7 @@ namespace Fanex.Athena.LGAPI.Core.Service
                 BypassProxyOnLocal = false
             } : null;
 
-            _client = new HttpClient(_options.MessageHandler ?? new HttpClientHandler { AllowAutoRedirect = false, UseCookies = false, Proxy = proxy })
+            _client = new HttpClient(_options.MessageHandler ?? new HttpClientHandler { AllowAutoRedirect = true, UseCookies = false, Proxy = proxy })
             {
                 Timeout = Timeout.InfiniteTimeSpan
             };
@@ -88,7 +88,9 @@ namespace Fanex.Athena.LGAPI.Core.Service
 
             var uri = new Uri($"{_options.Address.Trim('/')}/{path.Trim('/')}?{query}");
 
-            return new HttpRequestMessage(HttpMethod.Get, uri);
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("Accept", "application/json");
+            return request;
         }
 
         ~PortalService()
